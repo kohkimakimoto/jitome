@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+.tags
+.tags_sorted_by_file
+._*
+/jitome
+/.jitome
+/.jitome.toml
+/_vendor
+/build

@@ -1,0 +1,4 @@
+gom "github.com/codegangsta/cli"
+gom "github.com/daviddengcn/go-colortext"
+gom "github.com/go-fsnotify/fsnotify"
+gom "github.com/BurntSushi/toml"
