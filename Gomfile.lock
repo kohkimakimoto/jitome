@@ -1,0 +1,4 @@
+gom 'github.com/codegangsta/cli', :commit => '50c77ecec0068c9aef9d90ae0fd0fdf410041da3'
+gom 'github.com/daviddengcn/go-colortext', :commit => 'b5c0891944c2f150ccc9d02aecf51b76c14c2948'
+gom 'github.com/go-fsnotify/fsnotify', :commit => '96c060f6a6b7e0d6f75fddd10efeaca3e5d1bcb0'
+gom 'github.com/BurntSushi/toml', :commit => '443a628bc233f634a75bcbdd71fe5350789f1afa'
