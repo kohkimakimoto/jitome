@@ -1,4 +1,4 @@
-gom "github.com/codegangsta/cli"
+gom "github.com/codegangsta/cli", :tag => 'v1.2.0'
 gom "github.com/daviddengcn/go-colortext"
 gom "github.com/go-fsnotify/fsnotify"
 gom "github.com/BurntSushi/toml"
