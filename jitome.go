@@ -23,7 +23,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "jitome"
 	app.Usage = "Jitome runs a command when files change."
-	app.Version = "dev"
+	app.Version = "0.2.0"
 	app.Author = "Kohki Makimoto"
 	app.Email = "kohki.makimoto@gmail.com"
 	app.Flags = []cli.Flag{
