@@ -27,7 +27,7 @@ func WriteAppConfig(path string) *AppConfig {
 
 	content := []byte("[build]\n" +
 		"watch=[\"*.go\"]\n" +
-		"command=[\"go build\"]\n",
+		"command=[\"gofmt -w $FILE && go build\"]\n",
 	)
 
 	err := ioutil.WriteFile(path, content, os.ModePerm)
