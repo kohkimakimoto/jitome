@@ -20,6 +20,24 @@ type Task struct {
 	Command interface{}
 }
 
+func WriteAppConfig(path string) *AppConfig {
+	if isExist(path) {
+		log.Fatal("'" + path + "' is already exists.")
+	}
+
+	content := []byte("[build]\n" +
+		"watch=[\"*.go\"]\n" +
+		"command=[\"go build\"]\n",
+	)
+
+	err := ioutil.WriteFile(path, content, os.ModePerm)
+	if err != nil {
+		log.Fatal("Unable create file: '" + path + "'")
+	}
+
+	return NewAppConfig(path)
+}
+
 func NewAppConfig(path string) *AppConfig {
 	content, err := ioutil.ReadFile(path)
 	if err != nil {

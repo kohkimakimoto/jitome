@@ -16,6 +16,13 @@ var runCommand = cli.Command{
 	Action:      doRun,
 }
 
+var initCommand = cli.Command{
+	Name:        "init",
+	Usage:       "Generatea an initial jitome configuration file '.jitome'.",
+	Description: "",
+	Action:      doInit,
+}
+
 var debug bool = false
 var config *AppConfig
 
@@ -29,6 +36,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",
+            Value: ".jitome",
 			Usage: "Configuration file (default .jitome)",
 		},
 		cli.BoolFlag{
@@ -38,9 +46,20 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		runCommand,
+		initCommand,
 	}
 	app.Action = doRun
 	app.Run(os.Args)
+}
+
+func doInit(c *cli.Context) {
+    path := c.String("config")
+    if path == "" {
+        path = ".jitome"
+    }
+    config = WriteAppConfig(path)
+
+	printLogWithoutTimestamp("<info:bold>Generated file:</info:bold> <comment>" + path + "</comment>")
 }
 
 func doRun(c *cli.Context) {

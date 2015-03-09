@@ -85,6 +85,10 @@ func printColoredln(s interface{}) {
 	fmt.Println("")
 }
 
+func printLogWithoutTimestamp(s interface{}) {
+	printColoredln(s.(string))
+}
+
 func printLog(s interface{}) {
 	time := time.Now()
 	printColoredln("<green:bold>[</green:bold><cyan:bold>" + time.Format("2006-01-02T15:04:05Z07:00") + "</cyan:bold><green:bold>]</green:bold> " + s.(string))
