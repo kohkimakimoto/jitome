@@ -5,6 +5,7 @@ Thumbs.db
 ._*
 *.iml
 /jitome
+/jitome.exe
 /.jitome
 /.jitome.toml
 /_vendor

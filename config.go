@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"runtime"
 )
 
 type AppConfig struct {
@@ -27,7 +28,7 @@ func WriteAppConfig(path string) *AppConfig {
 
 	content := []byte("[build]\n" +
 		"watch=[\"*.go\"]\n" +
-		"command=[\"gofmt -w $FILE && go build\"]\n",
+		"command=[\"go build\"]\n",
 	)
 
 	err := ioutil.WriteFile(path, content, os.ModePerm)
@@ -109,6 +110,9 @@ func (task *Task) RunCommand(path string) {
 	for _, cmdline := range task.Commands() {
 		printLog("<info:bold>Command: </info:bold><magenta>" + cmdline + "</magenta>")
 		cmd := exec.Command("sh", "-c", cmdline)
+		if runtime.GOOS == "windows" {
+			cmd = exec.Command("cmd", cmdline)
+		}
 		cmd.Env = env
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
