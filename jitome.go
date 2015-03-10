@@ -9,11 +9,31 @@ import (
 	"time"
 )
 
+var flags = []cli.Flag{
+	cli.StringFlag{
+		Name:  "config, c",
+		Usage: "Configuration file (default .jitome)",
+	},
+	cli.BoolFlag{
+		Name:  "debug, d",
+		Usage: "Runs on debug mode",
+	},
+}
+
 var runCommand = cli.Command{
 	Name:        "run",
 	Usage:       "Runs jitome.",
 	Description: "",
 	Action:      doRun,
+	Flags:       flags,
+}
+
+var initCommand = cli.Command{
+	Name:        "init",
+	Usage:       "Generatea an initial jitome configuration file '.jitome'.",
+	Description: "",
+	Action:      doInit,
+	Flags:       flags,
 }
 
 var debug bool = false
@@ -23,24 +43,25 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "jitome"
 	app.Usage = "Jitome runs a command when files change."
-	app.Version = "dev"
+	app.Version = "0.2.0"
 	app.Author = "Kohki Makimoto"
 	app.Email = "kohki.makimoto@gmail.com"
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:  "config, c",
-			Usage: "Configuration file (default .jitome)",
-		},
-		cli.BoolFlag{
-			Name:  "debug, d",
-			Usage: "Runs on debug mode",
-		},
-	}
 	app.Commands = []cli.Command{
 		runCommand,
+		initCommand,
 	}
 	app.Action = doRun
 	app.Run(os.Args)
+}
+
+func doInit(c *cli.Context) {
+	path := c.String("config")
+	if path == "" {
+		path = ".jitome"
+	}
+	config = WriteAppConfig(path)
+
+	printLogWithoutTimestamp("<info:bold>Generated file:</info:bold> <comment>" + path + "</comment>")
 }
 
 func doRun(c *cli.Context) {

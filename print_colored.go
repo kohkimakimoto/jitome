@@ -85,12 +85,16 @@ func printColoredln(s interface{}) {
 	fmt.Println("")
 }
 
+func printLogWithoutTimestamp(s interface{}) {
+	printColoredln(s.(string))
+}
+
 func printLog(s interface{}) {
 	time := time.Now()
-	printColoredln("<green:bold>[</green:bold><cyan:bold>" + time.Format("15:04:05") + "</cyan:bold><green:bold>]</green:bold> " + s.(string))
+	printColoredln("<green:bold>[</green:bold><cyan:bold>" + time.Format("2006-01-02T15:04:05Z07:00") + "</cyan:bold><green:bold>]</green:bold> " + s.(string))
 }
 
 func printDebugLog(s interface{}) {
 	time := time.Now()
-	printColoredln("[" + time.Format("15:04:05") + "] " + s.(string))
+	printColoredln("[" + time.Format("2006-01-02T15:04:05Z07:00") + "] " + s.(string))
 }

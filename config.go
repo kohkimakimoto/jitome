@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"runtime"
 )
 
 type AppConfig struct {
@@ -18,6 +19,24 @@ type Task struct {
 	Watch   interface{}
 	Exclude interface{}
 	Command interface{}
+}
+
+func WriteAppConfig(path string) *AppConfig {
+	if isExist(path) {
+		log.Fatal("'" + path + "' is already exists.")
+	}
+
+	content := []byte("[build]\n" +
+		"watch=[\"*.go\"]\n" +
+		"command=[\"go build\"]\n",
+	)
+
+	err := ioutil.WriteFile(path, content, os.ModePerm)
+	if err != nil {
+		log.Fatal("Unable create file: '" + path + "'")
+	}
+
+	return NewAppConfig(path)
 }
 
 func NewAppConfig(path string) *AppConfig {
@@ -91,6 +110,9 @@ func (task *Task) RunCommand(path string) {
 	for _, cmdline := range task.Commands() {
 		printLog("<info:bold>Command: </info:bold><magenta>" + cmdline + "</magenta>")
 		cmd := exec.Command("sh", "-c", cmdline)
+		if runtime.GOOS == "windows" {
+			cmd = exec.Command("cmd", cmdline)
+		}
 		cmd.Env = env
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
