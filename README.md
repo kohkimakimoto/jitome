@@ -34,7 +34,7 @@ $ jitome
 
 To use `FILE` environment variable, you can get a file path that is detected changing
 
-```
+```toml
 [display_modified_file]
 watch="*"
 command="cat $FILE"
