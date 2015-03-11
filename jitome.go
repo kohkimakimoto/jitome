@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/go-fsnotify/fsnotify"
+    "gopkg.in/fsnotify.v1"
 	"log"
 	"os"
     "regexp"
@@ -13,7 +13,7 @@ import (
 var flags = []cli.Flag{
 	cli.StringFlag{
 		Name:  "config, c",
-		Usage: "Configuration file (default .jitome)",
+		Usage: "Configuration file (default '.jitome' or '.jitome.yml')",
 	},
 	cli.BoolFlag{
 		Name:  "debug, d",
@@ -23,7 +23,7 @@ var flags = []cli.Flag{
 
 var runCommand = cli.Command{
 	Name:        "run",
-	Usage:       "Runs jitome.",
+	Usage:       "Runs jitome. (Default command)",
 	Description: "",
 	Action:      doRun,
 	Flags:       flags,
@@ -31,7 +31,7 @@ var runCommand = cli.Command{
 
 var initCommand = cli.Command{
 	Name:        "init",
-	Usage:       "Generatea an initial jitome configuration file '.jitome'.",
+	Usage:       "Generatea an initial configuration file '.jitome'.",
 	Description: "",
 	Action:      doInit,
 	Flags:       flags,
@@ -43,8 +43,8 @@ var config *AppConfig
 func main() {
 	app := cli.NewApp()
 	app.Name = "jitome"
-	app.Usage = "Jitome runs a command when files change."
-	app.Version = "0.2.0"
+	app.Usage = "Jitome is a watcher for file changing."
+	app.Version = "0.3.0"
 	app.Author = "Kohki Makimoto"
 	app.Email = "kohki.makimoto@gmail.com"
 	app.Commands = []cli.Command{
@@ -73,7 +73,7 @@ func doRun(c *cli.Context) {
 
 	path := c.String("config")
 	if path == "" {
-		for _, p := range []string{".jitome", ".jitome.toml", ".jigome/config"} {
+		for _, p := range []string{".jitome", ".jitome.toml", ".jigome.yml"} {
 			if isFile(p) {
 				path = p
 				break

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BurntSushi/toml"
+	_ "gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"

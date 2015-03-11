@@ -2,7 +2,7 @@
 
 ![logo.png](logo.png)
 
-Jitome watches files and runs a command when files change.
+Jitome is a watcher for file changing
 
 ![jitome.gif](jitome.gif)
 
