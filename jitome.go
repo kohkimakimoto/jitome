@@ -73,7 +73,7 @@ func doRun(c *cli.Context) {
 
 	path := c.String("config")
 	if path == "" {
-		for _, p := range []string{".jitome", ".jitome.toml", ".jigome.yml"} {
+		for _, p := range []string{".jitome", ".jitome.toml", ".jitome.yml"} {
 			if isFile(p) {
 				path = p
 				break

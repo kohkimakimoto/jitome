@@ -2,13 +2,14 @@ package main
 
 import (
 	"github.com/BurntSushi/toml"
-	_ "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"runtime"
 )
 
@@ -17,9 +18,9 @@ type AppConfig struct {
 }
 
 type Task struct {
-	Watch   interface{}
-	Exclude interface{}
-	Command interface{}
+	Watch   interface{} `yaml:"watch"`
+	Exclude interface{} `yaml:"execlude"`
+	Command interface{} `yaml:"command"`
 }
 
 func WriteAppConfig(path string) *AppConfig {
@@ -27,10 +28,16 @@ func WriteAppConfig(path string) *AppConfig {
 		log.Fatal("'" + path + "' is already exists.")
 	}
 
-	content := []byte("[build]\n" +
-		"watch=[\"*.go\"]\n" +
-		"command=[\"go build\"]\n",
-	)
+	var content []byte
+	if IsYaml(path) {
+		content = []byte("build:\n" +
+			"    watch: \"go\"\n" +
+			"    command: \"go build\"\n")
+	} else {
+		content = []byte("[build]\n" +
+			"watch=[\"*.go\"]\n" +
+			"command=[\"go build\"]\n")
+	}
 
 	err := ioutil.WriteFile(path, content, os.ModePerm)
 	if err != nil {
@@ -48,14 +55,22 @@ func NewAppConfig(path string) *AppConfig {
 
 	config := &AppConfig{}
 
-	_, err = toml.Decode(string(content), &config.Tasks)
+	if IsYaml(path) {
+		err = yaml.Unmarshal(content, &config.Tasks)
+	} else {
+		_, err = toml.Decode(string(content), &config.Tasks)
+	}
 
-
-    if err != nil {
+	if err != nil {
 		log.Fatal(err)
 	}
 
 	return config
+}
+
+func IsYaml(path string) bool {
+	reg := regexp.MustCompile("\\.yml$")
+	return reg.MatchString(path)
 }
 
 func (task *Task) Watches() []string {
