@@ -49,7 +49,9 @@ func NewAppConfig(path string) *AppConfig {
 	config := &AppConfig{}
 
 	_, err = toml.Decode(string(content), &config.Tasks)
-	if err != nil {
+
+
+    if err != nil {
 		log.Fatal(err)
 	}
 

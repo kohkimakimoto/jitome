@@ -58,7 +58,7 @@ func main() {
 func doInit(c *cli.Context) {
 	path := c.String("config")
 	if path == "" {
-		path = ".jitome"
+		path = ".jitome.yml"
 	}
 	config = WriteAppConfig(path)
 
@@ -80,7 +80,7 @@ func doRun(c *cli.Context) {
 			}
 		}
 		if path == "" {
-			log.Fatal("Configuration File is not found: .jitome")
+			log.Fatal("Configuration File is not found: .jitome.yml")
 		}
 	}
 
