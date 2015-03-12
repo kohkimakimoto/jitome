@@ -1,3 +1,0 @@
-build:
-    watch: "go"
-    command: "go build"
