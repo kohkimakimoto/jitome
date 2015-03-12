@@ -4,6 +4,7 @@ Thumbs.db
 .tags_sorted_by_file
 ._*
 *.iml
+/.jitome*
 /jitome
 /jitome.exe
 /.jitome

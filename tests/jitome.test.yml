@@ -1,0 +1,6 @@
+build_a:
+    watch: "go"
+    command: "go build"
+build_b:
+    watch: "go"
+    command: "go build"
