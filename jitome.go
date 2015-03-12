@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-    "gopkg.in/fsnotify.v1"
+	"gopkg.in/fsnotify.v1"
 	"log"
 	"os"
-    "regexp"
 	"path/filepath"
+	"regexp"
 	"time"
 )
 
@@ -141,7 +141,7 @@ func runBufferedEventsRegister(bufferedEvents chan fsnotify.Event, events chan f
 }
 
 func startTaskWithPath(event *fsnotify.Event, path string) {
-    path = normalizePath(path)
+	path = normalizePath(path)
 	for name, task := range config.Tasks {
 		if task.Match(path) {
 			printLog("<info:bold>Detected changing:</info:bold> " + path)
@@ -153,14 +153,16 @@ func startTaskWithPath(event *fsnotify.Event, path string) {
 }
 
 func normalizePath(path string) string {
-    // remove "./"
-    // https://github.com/kohkimakimoto/jitome/pull/2
-    reg :=  regexp.MustCompile("^\\./")
-    nPath := reg.ReplaceAllString(path, "")
+	// remove "./"
+	// https://github.com/kohkimakimoto/jitome/pull/2
+	reg := regexp.MustCompile("^\\./")
+	nPath := reg.ReplaceAllString(path, "")
 
-    printDebugLog("Nomalize path '" + path + "' to '" + nPath + "'.")
+	if debug {
+		printDebugLog("Nomalize path '" + path + "' to '" + nPath + "'.")
+	}
 
-    return nPath
+	return nPath
 }
 
 func runEventsRegister(events chan<- fsnotify.Event, watcher *fsnotify.Watcher) {
