@@ -14,9 +14,25 @@ $ go get github.com/kohkimakimoto/jijtome
 
 ## Usage
 
-Create `.jitome` configuration file. The following is an example. The file format is [TOML](https://github.com/toml-lang/toml).
+Run `jitome init` to create `.jitome.yml` file and you should edit it.
+
+The following is an example of configuration.
+
+```yaml
+# .jitome.yml
+build:
+    watch:   "*.go"
+    command: "go build"
+
+test:
+    watch:   "*.go"
+    command: "your test command"
+```
+
+You can also use [TOML](https://github.com/toml-lang/toml) format to write configuration.
 
 ```toml
+# .jitome.toml
 [build]
 watch=["*.go"]
 command="go build"
@@ -34,10 +50,10 @@ $ jitome
 
 To use `FILE` environment variable, you can get a file path that is detected changing
 
-```toml
-[display_modified_file]
-watch="*"
-command="cat $FILE"
+```yaml
+display_modified_file:
+    watch: "*"
+    command: "cat $FILE"
 ```
 
 ## Author
