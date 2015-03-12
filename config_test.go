@@ -1,10 +1,14 @@
 package main
 
 import (
-    "testing"
+	"testing"
 )
 
 func TestNewAppConfig(t *testing.T) {
 
-    //t.Error("aaa")
+	config := NewAppConfig("tests/jitome.test.yml")
+	if config == nil {
+		t.Error("aaa")
+	}
+
 }
