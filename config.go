@@ -123,13 +123,12 @@ func (task *Task) Match(path string) bool {
 }
 
 func (task *Task) RunCommand(path string) {
-	env := []string{"FILE=" + path}
-
 	for _, cmdline := range task.Commands() {
+        env := append(os.Environ(), "FILE=" + path)
 		printLog("<info:bold>Command: </info:bold><magenta>" + cmdline + "</magenta>")
 		cmd := exec.Command("sh", "-c", cmdline)
 		if runtime.GOOS == "windows" {
-			cmd = exec.Command("cmd", cmdline)
+			cmd = exec.Command("cmd", "/c", cmdline)
 		}
 		cmd.Env = env
 		cmd.Stdout = os.Stdout

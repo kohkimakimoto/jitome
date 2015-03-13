@@ -44,7 +44,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "jitome"
 	app.Usage = "Jitome is a watcher for file changing."
-	app.Version = "0.3.1"
+	app.Version = "0.3.2"
 	app.Author = "Kohki Makimoto"
 	app.Email = "kohki.makimoto@gmail.com"
 	app.Commands = []cli.Command{
