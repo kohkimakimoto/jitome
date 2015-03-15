@@ -40,6 +40,8 @@ var initCommand = cli.Command{
 var debug bool = false
 var config *AppConfig
 
+var regexpForNormalizing = regexp.MustCompile("^\\./")
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "jitome"
@@ -153,10 +155,10 @@ func startTaskWithPath(event *fsnotify.Event, path string) {
 }
 
 func normalizePath(path string) string {
+	path = filepath.ToSlash(path)
 	// remove "./"
 	// https://github.com/kohkimakimoto/jitome/pull/2
-	reg := regexp.MustCompile("^\\./")
-	nPath := reg.ReplaceAllString(path, "")
+	nPath := regexpForNormalizing.ReplaceAllString(path, "")
 
 	if debug {
 		printDebugLog("Nomalize path '" + path + "' to '" + nPath + "'.")

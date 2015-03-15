@@ -14,13 +14,14 @@ import (
 )
 
 type AppConfig struct {
-	Tasks map[string]Task
+	Tasks map[string]*Task
 }
 
 type Task struct {
 	Watch   interface{} `yaml:"watch"`
 	Exclude interface{} `yaml:"execlude"`
 	Command interface{} `yaml:"command"`
+	regWatch      *regexp.Regexp
 }
 
 func WriteAppConfig(path string) *AppConfig {
@@ -48,6 +49,10 @@ func WriteAppConfig(path string) *AppConfig {
 }
 
 func NewAppConfig(path string) *AppConfig {
+	if debug {
+		printDebugLog("Loading config" + path)
+	}
+
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
@@ -59,6 +64,22 @@ func NewAppConfig(path string) *AppConfig {
 		err = yaml.Unmarshal(content, &config.Tasks)
 	} else {
 		_, err = toml.Decode(string(content), &config.Tasks)
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for name, task := range config.Tasks {
+		_ = name
+		if task.Watch == nil || task.Watch == "" {
+			if debug {
+				printDebugLog("watch is not defined")
+			}
+			continue
+		}
+
+
 	}
 
 	if err != nil {
