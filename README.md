@@ -22,6 +22,7 @@ The following is an example of configuration.
 # .jitome.yml
 build:
     watch:   '.+\.go$'
+    exclude: 'test\.go$'
     command: 'go build'
 
 test:
@@ -31,6 +32,7 @@ test:
 
 The top level directives `build` and `test` are tasks that must be unique name in all of tasks.
 `watch` is a regular expression string to define watching files.
+`exclude` is a regular expression string to define excluding watching files.
 `command` is a executed command  when it detects file changing.
 
 You can also use [TOML](https://github.com/toml-lang/toml) format to write configuration.
