@@ -5,3 +5,5 @@ command="ls"
 [build_b]
 watch="foo.txt"
 command="ls -la"
+
+

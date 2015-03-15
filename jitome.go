@@ -109,7 +109,6 @@ func doRun(c *cli.Context) {
 }
 
 func runBufferedEventsRegister(bufferedEvents chan fsnotify.Event, events chan fsnotify.Event) {
-
 	// event loop
 	for {
 		event := <-events
@@ -142,13 +141,14 @@ func runBufferedEventsRegister(bufferedEvents chan fsnotify.Event, events chan f
 	}
 }
 
+
 func startTaskWithPath(event *fsnotify.Event, path string) {
 	path = normalizePath(path)
 	for name, task := range config.Tasks {
 		if task.Match(path) {
 			printLog("<info:bold>Detected changing:</info:bold> " + path)
 			printLog("<info:bold>Starting:</info:bold> <comment>" + name + "</comment>")
-			task.RunCommand(path)
+			task.RunCommandWithPath(path)
 			printLog("<info:bold>Finished:</info:bold> <comment>" + name + "</comment>")
 		}
 	}

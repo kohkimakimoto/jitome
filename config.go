@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -18,10 +17,12 @@ type AppConfig struct {
 }
 
 type Task struct {
-	Watch   interface{} `yaml:"watch"`
-	Exclude interface{} `yaml:"execlude"`
-	Command interface{} `yaml:"command"`
-	regWatch      *regexp.Regexp
+	Watch          interface{} `yaml:"watch"`
+	Exclude        interface{} `yaml:"execlude"`
+	Command        interface{} `yaml:"command"`
+	watchStrings   []string
+	watchRegexps   []*regexp.Regexp
+	commandStrings []string
 }
 
 func WriteAppConfig(path string) *AppConfig {
@@ -71,15 +72,21 @@ func NewAppConfig(path string) *AppConfig {
 	}
 
 	for name, task := range config.Tasks {
-		_ = name
 		if task.Watch == nil || task.Watch == "" {
 			if debug {
-				printDebugLog("watch is not defined")
+				printDebugLog(name + ": watch is not defined")
 			}
 			continue
 		}
 
-
+		for _, pattern := range task.Watches() {
+			reg, err := regexp.Compile(pattern)
+			if err != nil {
+				log.Fatal(err)
+				continue
+			}
+			task.watchRegexps = append(task.watchRegexps, reg)
+		}
 	}
 
 	if err != nil {
@@ -95,57 +102,63 @@ func IsYaml(path string) bool {
 }
 
 func (task *Task) Watches() []string {
-	watches := make([]string, 0)
-	t := reflect.TypeOf(task.Watch)
-	if t.Kind() == reflect.String {
-		watches = append(watches, task.Watch.(string))
-	} else {
-		for _, v := range task.Watch.([]interface{}) {
-			watches = append(watches, v.(string))
+	if task.watchStrings == nil {
+		watches := make([]string, 0)
+		t := reflect.TypeOf(task.Watch)
+		if t.Kind() == reflect.String {
+			watches = append(watches, task.Watch.(string))
+		} else {
+			for _, v := range task.Watch.([]interface{}) {
+				watches = append(watches, v.(string))
+			}
 		}
+		task.watchStrings = watches
 	}
 
-	return watches
+	return task.watchStrings
 }
 
 func (task *Task) Commands() []string {
-	commands := make([]string, 0)
-	t := reflect.TypeOf(task.Command)
-	if t.Kind() == reflect.String {
-		commands = append(commands, task.Command.(string))
-	} else {
-		for _, v := range task.Command.([]interface{}) {
-			commands = append(commands, v.(string))
+
+	if task.commandStrings == nil {
+		commands := make([]string, 0)
+		t := reflect.TypeOf(task.Command)
+		if t.Kind() == reflect.String {
+			commands = append(commands, task.Command.(string))
+		} else {
+			for _, v := range task.Command.([]interface{}) {
+				commands = append(commands, v.(string))
+			}
 		}
+		task.commandStrings = commands
 	}
 
-	return commands
+	return task.commandStrings
 }
 
 func (task *Task) Match(path string) bool {
 	ret := false
-	for _, pattern := range task.Watches() {
-		match, _ := filepath.Match(pattern, path)
-		if match {
+	for i, reg := range task.watchRegexps {
+		if reg != nil && reg.MatchString(path) {
 			ret = true
 
 			if debug {
-				printDebugLog("Matched '" + pattern + "' (" + path + ")")
+				printDebugLog("Matched '" + task.watchStrings[i] + "' (" + path + ")")
 			}
 
 			break
 		} else {
 			if debug {
-				printDebugLog("Unmatched '" + pattern + "' (" + path + ")")
+				printDebugLog("Unmatched '" + task.watchStrings[i] + "' (" + path + ")")
 			}
 		}
 	}
 	return ret
 }
 
-func (task *Task) RunCommand(path string) {
+func (task *Task) RunCommandWithPath(path string) {
 	for _, cmdline := range task.Commands() {
-        env := append(os.Environ(), "FILE=" + path)
+		env := append(os.Environ(), "FILE="+path)
 		printLog("<info:bold>Command: </info:bold><magenta>" + cmdline + "</magenta>")
 		cmd := exec.Command("sh", "-c", cmdline)
 		if runtime.GOOS == "windows" {
