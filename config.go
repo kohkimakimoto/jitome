@@ -22,6 +22,8 @@ type Task struct {
 	Command        interface{} `yaml:"command"`
 	watchStrings   []string
 	watchRegexps   []*regexp.Regexp
+	excludeStrings []string
+	excludeRegexps []*regexp.Regexp
 	commandStrings []string
 }
 
@@ -33,12 +35,12 @@ func WriteAppConfig(path string) *AppConfig {
 	var content []byte
 	if IsYaml(path) {
 		content = []byte("build:\n" +
-			"    watch: \"*.go\"\n" +
-			"    command: \"go build\"\n")
+			"    watch: '.+\\.go$'" +
+			"    command: 'go build'\n")
 	} else {
 		content = []byte("[build]\n" +
-			"watch=[\"*.go\"]\n" +
-			"command=[\"go build\"]\n")
+			"watch=['.+\\.go$']\n" +
+			"command=['go build']\n")
 	}
 
 	err := ioutil.WriteFile(path, content, os.ModePerm)
@@ -71,22 +73,45 @@ func NewAppConfig(path string) *AppConfig {
 		log.Fatal(err)
 	}
 
-	for name, task := range config.Tasks {
-		if task.Watch == nil || task.Watch == "" {
-			if debug {
-				printDebugLog(name + ": watch is not defined")
+	for _, task := range config.Tasks {
+		// load watch
+		if task.Watch != nil && task.Watch != "" {
+			watches := make([]string, 0)
+			t := reflect.TypeOf(task.Watch)
+			if t.Kind() == reflect.String {
+				watches = append(watches, task.Watch.(string))
+			} else {
+				for _, v := range task.Watch.([]interface{}) {
+					watches = append(watches, v.(string))
+				}
 			}
-			continue
+			task.watchStrings = watches
+
+			for _, pattern := range task.watchStrings {
+				reg, err := regexp.Compile(pattern)
+				if err != nil {
+					log.Fatal(err)
+					continue
+				}
+				task.watchRegexps = append(task.watchRegexps, reg)
+			}
+
 		}
 
-		for _, pattern := range task.Watches() {
-			reg, err := regexp.Compile(pattern)
-			if err != nil {
-				log.Fatal(err)
-				continue
+		// load command
+		if task.Command != nil && task.Command != "" {
+			commands := make([]string, 0)
+			t := reflect.TypeOf(task.Command)
+			if t.Kind() == reflect.String {
+				commands = append(commands, task.Command.(string))
+			} else {
+				for _, v := range task.Command.([]interface{}) {
+					commands = append(commands, v.(string))
+				}
 			}
-			task.watchRegexps = append(task.watchRegexps, reg)
+			task.commandStrings = commands
 		}
+
 	}
 
 	if err != nil {
@@ -99,41 +124,6 @@ func NewAppConfig(path string) *AppConfig {
 func IsYaml(path string) bool {
 	reg := regexp.MustCompile("\\.yml$")
 	return reg.MatchString(path)
-}
-
-func (task *Task) Watches() []string {
-	if task.watchStrings == nil {
-		watches := make([]string, 0)
-		t := reflect.TypeOf(task.Watch)
-		if t.Kind() == reflect.String {
-			watches = append(watches, task.Watch.(string))
-		} else {
-			for _, v := range task.Watch.([]interface{}) {
-				watches = append(watches, v.(string))
-			}
-		}
-		task.watchStrings = watches
-	}
-
-	return task.watchStrings
-}
-
-func (task *Task) Commands() []string {
-
-	if task.commandStrings == nil {
-		commands := make([]string, 0)
-		t := reflect.TypeOf(task.Command)
-		if t.Kind() == reflect.String {
-			commands = append(commands, task.Command.(string))
-		} else {
-			for _, v := range task.Command.([]interface{}) {
-				commands = append(commands, v.(string))
-			}
-		}
-		task.commandStrings = commands
-	}
-
-	return task.commandStrings
 }
 
 func (task *Task) Match(path string) bool {
@@ -157,7 +147,7 @@ func (task *Task) Match(path string) bool {
 }
 
 func (task *Task) RunCommandWithPath(path string) {
-	for _, cmdline := range task.Commands() {
+	for _, cmdline := range task.commandStrings {
 		//env := append(os.Environ(), "FILE="+path)
 		cmdline = os.Expand(cmdline, func(s string) string {
 			switch s {

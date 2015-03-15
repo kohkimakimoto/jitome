@@ -21,24 +21,28 @@ The following is an example of configuration.
 ```yaml
 # .jitome.yml
 build:
-    watch:   '.+\.go'
+    watch:   '.+\.go$'
     command: 'go build'
 
 test:
-    watch:   '.+\.go'
+    watch:   '.+\.go$'
     command: 'your test command'
 ```
+
+The top level directives `build` and `test` are tasks that must be unique name in all of tasks.
+`watch` is a regular expression string to define watching files.
+`command` is a executed command  when it detects file changing.
 
 You can also use [TOML](https://github.com/toml-lang/toml) format to write configuration.
 
 ```toml
 # .jitome.toml
 [build]
-watch=['.+\.go']
+watch=['.+\.go$']
 command='go build'
 
 [test]
-watch=['.+\.go']
+watch=['.+\.go$']
 command='your test command'
 ```
 
@@ -52,7 +56,7 @@ To use `$JITOME_FILE`, you can get a file path that is detected changing
 
 ```yaml
 display_modified_file:
-    watch: '.+\.go'
+    watch: '.+\.go$'
     command: 'cat $JITOME_FILE'
 ```
 
