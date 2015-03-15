@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "fmt"
 	"github.com/BurntSushi/toml"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -18,7 +19,7 @@ type AppConfig struct {
 
 type Task struct {
 	Watch          interface{} `yaml:"watch"`
-	Exclude        interface{} `yaml:"execlude"`
+	Exclude        interface{} `yaml:"exclude"`
 	Command        interface{} `yaml:"command"`
 	watchStrings   []string
 	watchRegexps   []*regexp.Regexp
@@ -95,7 +96,30 @@ func NewAppConfig(path string) *AppConfig {
 				}
 				task.watchRegexps = append(task.watchRegexps, reg)
 			}
+		}
 
+		// load exclude
+		if task.Exclude != nil && task.Exclude != "" {
+
+			excludes := make([]string, 0)
+			t := reflect.TypeOf(task.Exclude)
+			if t.Kind() == reflect.String {
+				excludes = append(excludes, task.Exclude.(string))
+			} else {
+				for _, v := range task.Exclude.([]interface{}) {
+					excludes = append(excludes, v.(string))
+				}
+			}
+			task.excludeStrings = excludes
+
+			for _, pattern := range task.excludeStrings {
+				reg, err := regexp.Compile(pattern)
+				if err != nil {
+					log.Fatal(err)
+					continue
+				}
+				task.excludeRegexps = append(task.excludeRegexps, reg)
+			}
 		}
 
 		// load command
@@ -130,19 +154,35 @@ func (task *Task) Match(path string) bool {
 	ret := false
 	for i, reg := range task.watchRegexps {
 		if reg != nil && reg.MatchString(path) {
-			ret = true
 
+			ret = true
 			if debug {
-				printDebugLog("Matched '" + task.watchStrings[i] + "' (" + path + ")")
+				printDebugLog("Matched a watch string: '" + task.watchStrings[i] + "' (" + path + ")")
 			}
 
 			break
 		} else {
 			if debug {
-				printDebugLog("Unmatched '" + task.watchStrings[i] + "' (" + path + ")")
+				printDebugLog("Unmatched a watch string: '" + task.watchStrings[i] + "' (" + path + ")")
 			}
 		}
 	}
+
+	if ret {
+		for i, reg := range task.excludeRegexps {
+			if reg != nil && reg.MatchString(path) {
+				if debug {
+					printDebugLog("Matched a exclude string'" + task.excludeStrings[i] + "' (" + path + ")")
+				}
+				ret = false
+			} else {
+				if debug {
+					printDebugLog("Unmatched a exclude string'" + task.excludeStrings[i] + "' (" + path + ")")
+				}
+			}
+		}
+	}
+
 	return ret
 }
 

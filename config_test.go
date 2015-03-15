@@ -39,7 +39,6 @@ func TestNewAppConfig(t *testing.T) {
 		t.Error("Parse error. unmatch number of tasks.")
 	}
 
-
 	// yaml
 	config = NewAppConfig("tests/jitome.test.yml")
 	if config == nil {
