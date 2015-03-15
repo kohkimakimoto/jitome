@@ -36,7 +36,7 @@ func WriteAppConfig(path string) *AppConfig {
 	var content []byte
 	if IsYaml(path) {
 		content = []byte("build:\n" +
-			"    watch: '.+\\.go$'" +
+			"    watch: '.+\\.go$'\n" +
 			"    command: 'go build'\n")
 	} else {
 		content = []byte("[build]\n" +
