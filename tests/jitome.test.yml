@@ -1,6 +1,8 @@
 build_a:
-    watch: "go"
+    watch: '.+\.go'
     command: "go build"
 build_b:
-    watch: "go"
+    watch: '.+\.go'
     command: "go build"
+
+

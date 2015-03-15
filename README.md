@@ -21,12 +21,12 @@ The following is an example of configuration.
 ```yaml
 # .jitome.yml
 build:
-    watch:   "*.go"
-    command: "go build"
+    watch:   '.+\.go'
+    command: 'go build'
 
 test:
-    watch:   "*.go"
-    command: "your test command"
+    watch:   '.+\.go'
+    command: 'your test command'
 ```
 
 You can also use [TOML](https://github.com/toml-lang/toml) format to write configuration.
@@ -34,12 +34,12 @@ You can also use [TOML](https://github.com/toml-lang/toml) format to write confi
 ```toml
 # .jitome.toml
 [build]
-watch=["*.go"]
-command="go build"
+watch=['.+\.go']
+command='go build'
 
 [test]
-watch=["*.go"]
-command="your test command"
+watch=['.+\.go']
+command='your test command'
 ```
 
 Run `jitome`
@@ -48,12 +48,12 @@ Run `jitome`
 $ jitome
 ```
 
-To use `FILE` environment variable, you can get a file path that is detected changing
+To use `$JITOME_FILE`, you can get a file path that is detected changing
 
 ```yaml
 display_modified_file:
-    watch: "*"
-    command: "cat $FILE"
+    watch: '.+\.go'
+    command: 'cat $JITOME_FILE'
 ```
 
 ## Author
@@ -69,3 +69,4 @@ The MIT License (MIT)
 * [cespare/reflex](https://github.com/cespare/reflex)
 * [romanoff/gow](https://github.com/romanoff/gow)
 * [nathany/looper](https://github.com/nathany/looper)
+* [mattn/goemon](https://github.com/mattn/goemon)

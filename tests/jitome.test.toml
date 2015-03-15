@@ -1,9 +1,9 @@
 [build_a]
-watch="*"
+watch='.*'
 command="ls"
 
 [build_b]
-watch="foo.txt"
+watch='foo\.txt'
 command="ls -la"
 
 

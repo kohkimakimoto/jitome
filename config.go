@@ -158,13 +158,23 @@ func (task *Task) Match(path string) bool {
 
 func (task *Task) RunCommandWithPath(path string) {
 	for _, cmdline := range task.Commands() {
-		env := append(os.Environ(), "FILE="+path)
+		//env := append(os.Environ(), "FILE="+path)
+		cmdline = os.Expand(cmdline, func(s string) string {
+			switch s {
+			case "JITOME_FILE":
+				return path
+			}
+			return os.Getenv(s)
+		})
+
 		printLog("<info:bold>Command: </info:bold><magenta>" + cmdline + "</magenta>")
-		cmd := exec.Command("sh", "-c", cmdline)
+		var cmd *exec.Cmd
 		if runtime.GOOS == "windows" {
 			cmd = exec.Command("cmd", "/c", cmdline)
+		} else {
+			cmd = exec.Command("sh", "-c", cmdline)
 		}
-		cmd.Env = env
+		//		cmd.Env = env
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
