@@ -1,0 +1,21 @@
+build:
+  watch:
+    - base: ""
+      ignore_dir: [".git"]
+      pattern: "*.go"
+    - base: ""
+      ignore_dir: [".git"]
+      pattern: "*.go"
+  code: |
+    echo $JITOME_FILE
+    echo "hogehoge"
+
+    ls -la
+
+test:
+  watch:
+    - base: ""
+      ignore_dir: [".git"]
+      pattern: "*.go"
+  code: |
+    echo "test"
