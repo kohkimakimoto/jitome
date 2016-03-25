@@ -4,6 +4,7 @@ Thumbs.db
 ._*
 .vagrant
 *.iml
+/vendor/pkg
 
 /.jitome*
 /jitome
