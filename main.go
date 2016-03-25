@@ -12,7 +12,7 @@ import (
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Fprintf(os.Stderr, "[error] %v\n", err)
+			fmt.Fprintf(StderrWriter, FgRB("[error] %v\n"), err)
 			os.Exit(1)
 		}
 	}()
@@ -24,8 +24,8 @@ var debug bool
 var configFile string
 
 func realMain() int {
-	log.SetPrefix("[jitome] ")
-	log.SetOutput(os.Stdout)
+	log.SetPrefix("")
+	log.SetOutput(StdoutWriter)
 	log.SetFlags(0)
 
 	var initFlag bool

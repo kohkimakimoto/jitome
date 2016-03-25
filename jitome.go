@@ -68,6 +68,8 @@ func (jitome *Jitome) Start() error {
 	}
 	defer jitome.Close()
 
+	log.Print(FgGB("starting jitome..."))
+
 	for {
 		event := <-jitome.Event
 		runTask(event)
@@ -78,7 +80,7 @@ func (jitome *Jitome) Start() error {
 
 
 func runTask(event *Event) {
-	log.Printf("'%s' detected changing '%s' [%s].", event.Watcher.Task.Name, event.Ev.Name, eventOpStr(&event.Ev))
+	log.Printf("'%s' detected changing '%s' [%s].", FgCB(event.Watcher.Task.Name), FgYB(event.Ev.Name), FgGB(eventOpStr(&event.Ev)))
 
 	path := event.Ev.Name
 	task := event.Watcher.Task
