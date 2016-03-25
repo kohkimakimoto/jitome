@@ -4,8 +4,6 @@
 
 Jitome is a watcher for file changing
 
-![jitome.gif](jitome.gif)
-
 ## Installation
 
 ```
