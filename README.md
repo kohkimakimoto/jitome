@@ -9,7 +9,7 @@ Jitome is a watcher for file changing
 ## Installation
 
 ```
-$ go get github.com/kohkimakimoto/jijtome
+$ go get github.com/kohkimakimoto/jitome
 ```
 
 ## Usage
@@ -34,33 +34,6 @@ The top level directives `build` and `test` are tasks that must be unique name i
 `watch` is a regular expression string to define watching files.
 `exclude` is a regular expression string to define excluding watching files.
 `command` is a executed command  when it detects file changing.
-
-You can also use [TOML](https://github.com/toml-lang/toml) format to write configuration.
-
-```toml
-# .jitome.toml
-[build]
-watch=['.+\.go$']
-command='go build'
-
-[test]
-watch=['.+\.go$']
-command='your test command'
-```
-
-Run `jitome`
-
-```
-$ jitome
-```
-
-To use `$JITOME_FILE`, you can get a file path that is detected changing
-
-```yaml
-display_modified_file:
-    watch: '.+\.go$'
-    command: 'cat $JITOME_FILE'
-```
 
 ## Author
 

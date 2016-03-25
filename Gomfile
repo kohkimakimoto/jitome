@@ -1,9 +1,2 @@
-gom "github.com/BurntSushi/toml"
-gom "github.com/codegangsta/cli"
-gom "github.com/daviddengcn/go-colortext"
 gom "gopkg.in/fsnotify.v1"
 gom "gopkg.in/yaml.v2"
-
-# For development
-gom "github.com/motemen/go-quickfix/cmd/goquickfix"
-
