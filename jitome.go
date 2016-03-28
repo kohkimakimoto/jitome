@@ -77,8 +77,6 @@ func (jitome *Jitome) Start() error {
 		runTask(event)
 	}
 
-
-
 	return nil
 }
 
