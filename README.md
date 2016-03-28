@@ -2,7 +2,7 @@
 
 ![logo.png](logo.png)
 
-Jitome is a watcher for file changing.
+Jitome is a simple file watcher.
 
 ## Installation
 
@@ -12,8 +12,7 @@ $ go get github.com/kohkimakimoto/jitome
 
 ## Usage
 
-Run `jitome -i` to create `jitome.yml` file and you should edit it.
-
+Run `jitome -i` to create `jitome.yml` file that is a main configuration file for jitome.
 The following is an example of configuration.
 
 ```yaml
@@ -25,8 +24,7 @@ build:
   script: |
     go build .
 ```
-
-run `jitome`
+run `jitome`. It is watching file changing.
 
 ```
 $ jitome

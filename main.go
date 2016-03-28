@@ -90,7 +90,7 @@ func generateConfig() error {
 func printUsage() {
 	fmt.Println(`Usage: jitome [<options>]
 
-Jitome is a watcher for file changing.
+Jitome is a simple file watcher.
 
 Options:
   -c|-config    Specify a config file.
