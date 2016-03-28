@@ -46,7 +46,6 @@ func (jitome *Jitome) Start() error {
 			log.Printf("setup '%s'", name)
 		}
 
-
 		// register watched directories
 		for i, watchConfig := range task.Watch {
 			w, err := fsnotify.NewWatcher()
@@ -78,11 +77,13 @@ func (jitome *Jitome) Start() error {
 		runTask(event)
 	}
 
+
+
 	return nil
 }
 
 func runTask(event *Event) {
-	log.Printf("'%s' detected changing '%s' [%s].", FgCB(event.Watcher.Task.Name), FgYB(event.Ev.Name), FgGB(eventOpStr(&event.Ev)))
+	log.Printf("'%s' detected changing '%s' [%s]. running script...", FgCB(event.Watcher.Task.Name), FgYB(event.Ev.Name), FgGB(eventOpStr(&event.Ev)))
 
 	path := event.Ev.Name
 	task := event.Watcher.Task
@@ -110,6 +111,8 @@ func runTask(event *Event) {
 	if err != nil {
 		log.Printf("[warning] %v", err)
 	}
+
+	log.Printf("'%s' finished script.", FgCB(event.Watcher.Task.Name))
 }
 
 func watch(base string, ignoreDir interface{}, watcher *fsnotify.Watcher) error {
@@ -143,8 +146,6 @@ func watch(base string, ignoreDir interface{}, watcher *fsnotify.Watcher) error 
 		if err != nil || !fi.IsDir() {
 			return nil
 		}
-
-		//path = normalizePath(path)
 
 		for _, ig := range ignores {
 			if strings.HasPrefix(ig, "/") {

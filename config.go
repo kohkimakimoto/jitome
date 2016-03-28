@@ -10,6 +10,5 @@ var initialConfig = `build:
       ignore_dir: [".git"]
       pattern: '.+\.go$'
   script: |
-    cat $JITOME_FILE
-    go test .
+    go build .
 `
