@@ -20,7 +20,7 @@ func (task *Task) Wait() {
 
 		timer := time.NewTimer(300 * time.Millisecond)
 
-		outer:
+	outer:
 		for {
 			select {
 			case nextEvent := <-task.events:

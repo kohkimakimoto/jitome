@@ -2,19 +2,15 @@ build:
   watch:
     - base: ""
       ignore_dir: [".git"]
-      pattern: "*.go"
-    - base: ""
-      ignore_dir: [".git"]
-      pattern: "*.go"
+      pattern: '.+\.go$'
   script: |
-    echo $JITOME_FILE
-    echo "hogehoge"
-    ls -la
+    cat $JITOME_FILE
+    go test .
 
-test:
-  watch:
-    - base: ""
-      ignore_dir: [".git"]
-      pattern: "*.go"
-  script: |
-    echo "test"
+#
+# test:
+#   watch:
+#     - base: ""
+#       ignore_dir: [".git"]
+#   script: |
+#     echo "test"

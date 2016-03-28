@@ -17,7 +17,7 @@ type Jitome struct {
 	Watchers []*Watcher
 
 	// Event is queue that receives file change event.
-	Events   chan *Event
+	Events chan *Event
 }
 
 type Event struct {
@@ -29,7 +29,7 @@ func NewJitome(config *Config) *Jitome {
 	w := &Jitome{
 		Config:   config,
 		Watchers: []*Watcher{},
-		Events:    make(chan *Event),
+		Events:   make(chan *Event),
 	}
 
 	return w
@@ -46,23 +46,23 @@ func (jitome *Jitome) Start() error {
 			log.Printf("setup '%s'", name)
 		}
 
-		w, err := fsnotify.NewWatcher()
-		if err != nil {
-			return err
-		}
 
 		// register watched directories
-		for _, watchConfig := range task.Watch {
-			err := watch(watchConfig.Base, watchConfig.IgnoreDir, w)
+		for i, watchConfig := range task.Watch {
+			w, err := fsnotify.NewWatcher()
 			if err != nil {
 				return err
 			}
 
-			watcher, err := NewWatcher(jitome, task, watchConfig, w)
+			err = watch(watchConfig.Base, watchConfig.IgnoreDir, w)
 			if err != nil {
 				return err
 			}
 
+			watcher, err := NewWatcher(jitome, task, watchConfig, w, i)
+			if err != nil {
+				return err
+			}
 
 			jitome.Watchers = append(jitome.Watchers, watcher)
 			go watcher.Wait()
@@ -122,27 +122,29 @@ func watch(base string, ignoreDir interface{}, watcher *fsnotify.Watcher) error 
 	}
 
 	ignores := []string{}
-	if e, ok := ignoreDir.(string); ok {
-		ignores = append(ignores, e)
-	} else if e, ok := ignoreDir.([]interface{}); ok {
-		for _, i := range e {
-			ignores = append(ignores, i.(string))
+	if ignoreDir != nil {
+		if e, ok := ignoreDir.(string); ok {
+			ignores = append(ignores, e)
+		} else if e, ok := ignoreDir.([]interface{}); ok {
+			for _, i := range e {
+				ignores = append(ignores, i.(string))
+			}
+		} else {
+			v := reflect.ValueOf(ignoreDir)
+			return fmt.Errorf("invalid format ignore_dir: %v", v.Type())
 		}
-	} else {
-		v := reflect.ValueOf(ignoreDir)
-		return fmt.Errorf("invalid format ignore_dir: %v", v.Type())
+		if debug {
+			log.Printf("ignore_dir: %v", ignores)
+		}
 	}
 
-	if debug {
-		log.Printf("ignore_dir: %v", ignores)
-	}
 	// register watched directories.
 	err := filepath.Walk(base, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || !fi.IsDir() {
 			return nil
 		}
 
-		path = normalizePath(path)
+		//path = normalizePath(path)
 
 		for _, ig := range ignores {
 			if strings.HasPrefix(ig, "/") {

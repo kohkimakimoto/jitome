@@ -6,9 +6,10 @@ type Config struct {
 
 var initialConfig = `build:
   watch:
-    - base: "."
-      pattern: "*.go"
+    - base: ""
+      ignore_dir: [".git"]
+      pattern: '.+\.go$'
   script: |
-    go test ./...
-    go build
+    cat $JITOME_FILE
+    go test .
 `
