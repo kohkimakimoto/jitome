@@ -2,64 +2,32 @@
 
 ![logo.png](logo.png)
 
-Jitome is a watcher for file changing
-
-![jitome.gif](jitome.gif)
+Jitome is a simple file watcher.
 
 ## Installation
 
 ```
-$ go get github.com/kohkimakimoto/jijtome
+$ go get github.com/kohkimakimoto/jitome
 ```
 
 ## Usage
 
-Run `jitome init` to create `.jitome.yml` file and you should edit it.
-
+Run `jitome -i` to create `jitome.yml` file that is a main configuration file for jitome.
 The following is an example of configuration.
 
 ```yaml
-# .jitome.yml
 build:
-    watch:   '.+\.go$'
-    exclude: 'test\.go$'
-    command: 'go build'
-
-test:
-    watch:   '.+\.go$'
-    command: 'your test command'
+  watch:
+    - base: ""
+      ignore_dir: [".git"]
+      pattern: '.+\.go$'
+  script: |
+    go build .
 ```
-
-The top level directives `build` and `test` are tasks that must be unique name in all of tasks.
-`watch` is a regular expression string to define watching files.
-`exclude` is a regular expression string to define excluding watching files.
-`command` is a executed command  when it detects file changing.
-
-You can also use [TOML](https://github.com/toml-lang/toml) format to write configuration.
-
-```toml
-# .jitome.toml
-[build]
-watch=['.+\.go$']
-command='go build'
-
-[test]
-watch=['.+\.go$']
-command='your test command'
-```
-
-Run `jitome`
+run `jitome`. It is watching file changing.
 
 ```
 $ jitome
-```
-
-To use `$JITOME_FILE`, you can get a file path that is detected changing
-
-```yaml
-display_modified_file:
-    watch: '.+\.go$'
-    command: 'cat $JITOME_FILE'
 ```
 
 ## Author

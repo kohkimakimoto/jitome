@@ -1,14 +1,7 @@
-package main
-
-type Config struct {
-	Tasks map[string]*Task
-}
-
-var initialConfig = `build:
+build:
   watch:
     - base: ""
       ignore_dir: [".git"]
       pattern: '.+\.go$'
   script: |
     go build .
-`
