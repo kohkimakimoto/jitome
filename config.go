@@ -5,7 +5,7 @@ type Config struct {
 }
 
 type Task struct {
-	Name string `yaml:"-"`
+	Name  string         `yaml:"-"`
 	Watch []*WatchConfig `yaml:"watch"`
 	Code  string         `yaml:"code"`
 }

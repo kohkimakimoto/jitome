@@ -5,11 +5,11 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
-	"strings"
-	"os/exec"
 	"runtime"
+	"strings"
 )
 
 type Jitome struct {
@@ -56,10 +56,10 @@ func (jitome *Jitome) Start() error {
 			}
 
 			watcher := &Watcher{
-				Jitome: jitome,
-				Task:   task,
+				Jitome:      jitome,
+				Task:        task,
 				WatchConfig: watchConfig,
-				w:      w,
+				w:           w,
 			}
 
 			jitome.Watchers = append(jitome.Watchers, watcher)
@@ -77,7 +77,6 @@ func (jitome *Jitome) Start() error {
 
 	return nil
 }
-
 
 func runTask(event *Event) {
 	log.Printf("'%s' detected changing '%s' [%s].", FgCB(event.Watcher.Task.Name), FgYB(event.Ev.Name), FgGB(eventOpStr(&event.Ev)))

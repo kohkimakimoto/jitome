@@ -5,10 +5,10 @@ import (
 )
 
 type Watcher struct {
-	Jitome *Jitome
-	Task   *Task
+	Jitome      *Jitome
+	Task        *Task
 	WatchConfig *WatchConfig
-	w      *fsnotify.Watcher
+	w           *fsnotify.Watcher
 }
 
 func (watcher *Watcher) Wait() {
