@@ -17,7 +17,7 @@ type Jitome struct {
 	Watchers []*Watcher
 
 	// Event is queue that receives file change event.
-	Event chan *Event
+	Events   chan *Event
 }
 
 type Event struct {
@@ -29,7 +29,7 @@ func NewJitome(config *Config) *Jitome {
 	w := &Jitome{
 		Config:   config,
 		Watchers: []*Watcher{},
-		Event:    make(chan *Event),
+		Events:    make(chan *Event),
 	}
 
 	return w
@@ -39,6 +39,9 @@ func (jitome *Jitome) Start() error {
 	// register watchers
 	for name, task := range jitome.Config.Tasks {
 		task.Name = name
+		task.events = make(chan *Event, 30)
+		task.jitome = jitome
+
 		if debug {
 			log.Printf("setup '%s'", name)
 		}
@@ -55,23 +58,23 @@ func (jitome *Jitome) Start() error {
 				return err
 			}
 
-			watcher := &Watcher{
-				Jitome:      jitome,
-				Task:        task,
-				WatchConfig: watchConfig,
-				w:           w,
+			watcher, err := NewWatcher(jitome, task, watchConfig, w)
+			if err != nil {
+				return err
 			}
+
 
 			jitome.Watchers = append(jitome.Watchers, watcher)
 			go watcher.Wait()
 		}
+		go task.Wait()
 	}
 	defer jitome.Close()
 
 	log.Print(FgGB("starting jitome..."))
 
 	for {
-		event := <-jitome.Event
+		event := <-jitome.Events
 		runTask(event)
 	}
 
@@ -83,7 +86,7 @@ func runTask(event *Event) {
 
 	path := event.Ev.Name
 	task := event.Watcher.Task
-	code := task.Code
+	code := task.Script
 
 	code = os.Expand(code, func(s string) string {
 		switch s {
@@ -133,7 +136,6 @@ func watch(base string, ignoreDir interface{}, watcher *fsnotify.Watcher) error 
 	if debug {
 		log.Printf("ignore_dir: %v", ignores)
 	}
-
 	// register watched directories.
 	err := filepath.Walk(base, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || !fi.IsDir() {

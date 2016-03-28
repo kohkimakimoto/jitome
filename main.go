@@ -12,7 +12,7 @@ import (
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Fprintf(StderrWriter, FgRB("[error] %v\n"), err)
+			fmt.Fprintf(ColorStderrWriter, FgRB("[error] %v\n", err))
 			os.Exit(1)
 		}
 	}()
@@ -25,7 +25,7 @@ var configFile string
 
 func realMain() int {
 	log.SetPrefix("")
-	log.SetOutput(StdoutWriter)
+	log.SetOutput(ColorStdoutWriter)
 	log.SetFlags(0)
 
 	var initFlag bool
@@ -79,15 +79,7 @@ func generateConfig() error {
 		return fmt.Errorf("%s is already existed.", configFile)
 	}
 
-	err := ioutil.WriteFile(configFile, []byte(`build:
-  watch:
-    - base: "."
-      pattern: "*.go"
-  code: |
-    go test ./...
-    go build
-`), 0644)
-
+	err := ioutil.WriteFile(configFile, []byte(initialConfig), 0644)
 	if err != nil {
 		return err
 	}

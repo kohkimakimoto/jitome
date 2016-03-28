@@ -6,10 +6,9 @@ build:
     - base: ""
       ignore_dir: [".git"]
       pattern: "*.go"
-  code: |
+  script: |
     echo $JITOME_FILE
     echo "hogehoge"
-
     ls -la
 
 test:
@@ -17,5 +16,5 @@ test:
     - base: ""
       ignore_dir: [".git"]
       pattern: "*.go"
-  code: |
+  script: |
     echo "test"

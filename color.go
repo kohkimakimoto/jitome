@@ -6,8 +6,8 @@ import (
 	"os"
 )
 
-var StderrWriter = ansicolor.NewAnsiColorWriter(os.Stderr)
-var StdoutWriter = ansicolor.NewAnsiColorWriter(os.Stdout)
+var ColorStdoutWriter = ansicolor.NewAnsiColorWriter(os.Stdout)
+var ColorStderrWriter = ansicolor.NewAnsiColorWriter(os.Stderr)
 
 var FgBold = color.New(color.Bold).SprintfFunc()
 var FgG = color.New(color.FgGreen).SprintfFunc()
