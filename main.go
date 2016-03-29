@@ -12,7 +12,7 @@ import (
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Fprintf(ColorStderrWriter, FgRB("[error] %v\n", err))
+			fmt.Fprintf(ColorStderrWriter, FgRB("[jitome] error: %v\n", err))
 			os.Exit(1)
 		}
 	}()
@@ -24,7 +24,7 @@ var debug bool
 var configFile string
 
 func realMain() int {
-	log.SetPrefix("")
+	log.SetPrefix(FgGB("[jitome] "))
 	log.SetOutput(ColorStdoutWriter)
 	log.SetFlags(0)
 
@@ -46,7 +46,7 @@ func realMain() int {
 			panic(err)
 		}
 
-		log.Printf("Created '%s'", configFile)
+		log.Printf("created '%s'", configFile)
 		return 0
 	}
 
@@ -60,7 +60,7 @@ func realMain() int {
 	}
 
 	config := &Config{}
-	err = yaml.Unmarshal(b, &config.Tasks)
+	err = yaml.Unmarshal(b, &config.Targets)
 	if err != nil {
 		panic(err)
 	}

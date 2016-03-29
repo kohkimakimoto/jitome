@@ -1,7 +1,11 @@
-build:
+init:
+  script: |
+      echo "aaaa"
+
+dev:
   watch:
     - base: ""
-      ignore_dir: [".git"]
-      pattern: '.+\.go$'
+      ignore: [".git"]
+      pattern: ["*.yml", "*.go"]
   script: |
-    go build .
+    echo "OK"

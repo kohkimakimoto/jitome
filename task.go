@@ -2,7 +2,7 @@ package main
 
 import "time"
 
-type Task struct {
+type Target struct {
 	Name   string         `yaml:"-"`
 	Watch  []*WatchConfig `yaml:"watch"`
 	Script string         `yaml:"script"`
@@ -11,9 +11,9 @@ type Task struct {
 	jitome *Jitome
 }
 
-func (task *Task) Wait() {
+func (target *Target) Wait() {
 	for {
-		event := <-task.events
+		event := <-target.events
 
 		buffer := []*Event{event}
 		bufferedFilesMap := map[string]int{event.Ev.Name: 1}
@@ -23,7 +23,7 @@ func (task *Task) Wait() {
 	outer:
 		for {
 			select {
-			case nextEvent := <-task.events:
+			case nextEvent := <-target.events:
 				// ignore a event is caused by same file path.
 				if event.Ev.Name != nextEvent.Ev.Name {
 					if _, exists := bufferedFilesMap[nextEvent.Ev.Name]; !exists {
@@ -33,7 +33,7 @@ func (task *Task) Wait() {
 				}
 			case <-timer.C:
 				for _, be := range buffer {
-					task.jitome.Events <- be
+					target.jitome.Events <- be
 				}
 				break outer
 			}

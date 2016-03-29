@@ -1,54 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"log"
-	"reflect"
-	"regexp"
 )
 
 type Watcher struct {
-	Jitome              *Jitome
-	Task                *Task
-	WatchConfig         *WatchConfig
-	w                   *fsnotify.Watcher
-	watchPatternRegexps []*regexp.Regexp
-
-	index int
+	Jitome      *Jitome
+	Target      *Target
+	WatchConfig *WatchConfig
+	w           *fsnotify.Watcher
+	index       int
 }
 
-func NewWatcher(jitome *Jitome, task *Task, watchConfig *WatchConfig, w *fsnotify.Watcher, index int) (*Watcher, error) {
+func NewWatcher(jitome *Jitome, target *Target, watchConfig *WatchConfig, w *fsnotify.Watcher, index int) (*Watcher, error) {
 	watcher := &Watcher{
-		Jitome:              jitome,
-		Task:                task,
-		WatchConfig:         watchConfig,
-		w:                   w,
-		watchPatternRegexps: []*regexp.Regexp{},
-		index:               index,
+		Jitome:        jitome,
+		Target:          target,
+		WatchConfig:   watchConfig,
+		w:             w,
+
+		index: index,
 	}
 
-	pattern := watchConfig.Pattern
-	if pattern != nil {
-		if patternStr, ok := pattern.(string); ok {
-			reg, err := regexp.Compile(patternStr)
-			if err != nil {
-				return nil, fmt.Errorf("invalid pattern '%s': %v", patternStr, err)
-			}
-			watcher.watchPatternRegexps = append(watcher.watchPatternRegexps, reg)
-		} else if e, ok := pattern.([]interface{}); ok {
-			for _, patternStr := range e {
-				reg, err := regexp.Compile(patternStr.(string))
-				if err != nil {
-					return nil, fmt.Errorf("invalid pattern '%s': %v", patternStr, err)
-				}
-				watcher.watchPatternRegexps = append(watcher.watchPatternRegexps, reg)
-			}
-		} else {
-			v := reflect.ValueOf(pattern)
-			return nil, fmt.Errorf("invalid format pattern: %v", v.Type())
-		}
-	}
 	return watcher, nil
 }
 
@@ -63,8 +37,8 @@ func (watcher *Watcher) Wait() {
 			}
 
 			if event.Op&fsnotify.Create != 0 && isDir(path) {
-				for _, watchConfig := range watcher.Task.Watch {
-					err := watch(path, watchConfig.IgnoreDir, watcher.w)
+				for _, watchConfig := range watcher.Target.Watch {
+					err := watch(path, watchConfig.IgnorePatterns, watcher.w)
 					if err != nil {
 						panic(err)
 					}
@@ -80,12 +54,12 @@ func (watcher *Watcher) Wait() {
 			// check pattern.
 			if !watcher.Match(path) {
 				if debug {
-					log.Printf("'%s' watcher %d detected changing '%s' but it was unmatched to pattern config", watcher.Task.Name, watcher.index, path)
+					log.Printf("target '%s' watcher %d detected changing '%s' but it was unmatched to pattern config", watcher.Target.Name, watcher.index, path)
 				}
 				continue
 			}
 
-			watcher.Task.events <- &Event{
+			watcher.Target.events <- &Event{
 				Watcher: watcher,
 				Ev:      event,
 			}
@@ -97,19 +71,36 @@ func (watcher *Watcher) Wait() {
 }
 
 func (watcher *Watcher) Match(path string) bool {
-	ret := false
-	if len(watcher.watchPatternRegexps) == 0 {
+	if len(watcher.WatchConfig.Patterns) == 0 {
 		return true
 	}
 
-	for _, reg := range watcher.watchPatternRegexps {
+	for _, ptn := range watcher.WatchConfig.IgnorePatterns {
 		if debug {
-			log.Printf("cheking pattern '%s'", reg.String())
+			log.Printf("cheking ignore pattern '%s'", ptn.String())
 		}
-		if reg != nil && reg.MatchString(path) {
-			ret = true
-			break
+
+		if ptn.MatchString(path) {
+			if debug {
+				log.Printf("matched ignore pattern '%s'", ptn.String())
+			}
+			return false
 		}
 	}
-	return ret
+
+	for _, ptn := range watcher.WatchConfig.Patterns {
+		if debug {
+			log.Printf("cheking pattern '%s'", ptn.String())
+		}
+
+		if ptn.MatchString(path) {
+			if debug {
+				log.Printf("matched pattern '%s'", ptn.String())
+			}
+
+			return true
+		}
+	}
+
+	return false
 }

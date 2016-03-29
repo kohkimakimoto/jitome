@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"reflect"
+	"regexp"
 	"runtime"
 	"strings"
 )
@@ -18,6 +17,8 @@ type Jitome struct {
 
 	// Event is queue that receives file change event.
 	Events chan *Event
+
+	InitTask *Target
 }
 
 type Event struct {
@@ -36,29 +37,58 @@ func NewJitome(config *Config) *Jitome {
 }
 
 func (jitome *Jitome) Start() error {
-	// register watchers
-	for name, task := range jitome.Config.Tasks {
-		task.Name = name
-		task.events = make(chan *Event, 30)
-		task.jitome = jitome
+	log.Print("starting jitome...")
 
-		if debug {
-			log.Printf("setup '%s'", name)
+	// check init task
+	for name, target := range jitome.Config.Targets {
+		if name == "init" {
+			target.Name = name
+			target.jitome = jitome
+			jitome.InitTask = target
+			if debug {
+				log.Print("registered 'init' task")
+			}
+			break
+		}
+	}
+
+	if jitome.InitTask != nil {
+		if jitome.InitTask.Script != "" {
+			log.Print("running '" + FgCB("init") + "' target.")
+			err := runScript(jitome.InitTask.Script)
+			if err != nil {
+				return err
+			}
+			log.Print("finished '" + FgCB("init") + "' target.")
+		}
+	}
+
+	// register watchers
+	for name, target := range jitome.Config.Targets {
+		if name == "init" {
+			continue
 		}
 
+		target.Name = name
+		target.events = make(chan *Event, 30)
+		target.jitome = jitome
+
+		log.Print("evaluate target '" + FgCB(name) + "'.")
+
 		// register watched directories
-		for i, watchConfig := range task.Watch {
+		for i, watchConfig := range target.Watch {
+			watchConfig.InitPatterns()
 			w, err := fsnotify.NewWatcher()
 			if err != nil {
 				return err
 			}
 
-			err = watch(watchConfig.Base, watchConfig.IgnoreDir, w)
+			err = watch(watchConfig.Base, watchConfig.IgnorePatterns, w)
 			if err != nil {
 				return err
 			}
 
-			watcher, err := NewWatcher(jitome, task, watchConfig, w, i)
+			watcher, err := NewWatcher(jitome, target, watchConfig, w, i)
 			if err != nil {
 				return err
 			}
@@ -66,11 +96,11 @@ func (jitome *Jitome) Start() error {
 			jitome.Watchers = append(jitome.Watchers, watcher)
 			go watcher.Wait()
 		}
-		go task.Wait()
+		go target.Wait()
 	}
 	defer jitome.Close()
 
-	log.Print(FgGB("starting jitome..."))
+	log.Print("watching files...")
 
 	for {
 		event := <-jitome.Events
@@ -81,13 +111,13 @@ func (jitome *Jitome) Start() error {
 }
 
 func runTask(event *Event) {
-	log.Printf("'%s' detected changing '%s' [%s]. running script...", FgCB(event.Watcher.Task.Name), FgYB(event.Ev.Name), FgGB(eventOpStr(&event.Ev)))
+	log.Printf("'%s' target detected '%s' changing [%s]. running script.", FgCB(event.Watcher.Target.Name), FgYB(event.Ev.Name), FgGB(eventOpStr(&event.Ev)))
 
 	path := event.Ev.Name
-	task := event.Watcher.Task
-	code := task.Script
+	task := event.Watcher.Target
+	script := task.Script
 
-	code = os.Expand(code, func(s string) string {
+	script = os.Expand(script, func(s string) string {
 		switch s {
 		case "JITOME_FILE":
 			return path
@@ -97,9 +127,9 @@ func runTask(event *Event) {
 
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
-		cmd = exec.Command("cmd", "/c", code)
+		cmd = exec.Command("cmd", "/c", script)
 	} else {
-		cmd = exec.Command("sh", "-c", code)
+		cmd = exec.Command("sh", "-c", script)
 	}
 
 	cmd.Stdout = os.Stdout
@@ -110,49 +140,50 @@ func runTask(event *Event) {
 		log.Printf("[warning] %v", err)
 	}
 
-	log.Printf("'%s' finished script.", FgCB(event.Watcher.Task.Name))
+	log.Printf("'%s' target finished script.", FgCB(event.Watcher.Target.Name))
 }
 
-func watch(base string, ignoreDir interface{}, watcher *fsnotify.Watcher) error {
+func runScript(script string) error {
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/c", script)
+	} else {
+		cmd = exec.Command("sh", "-c", script)
+	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	return cmd.Run()
+}
+
+func watch(base string, ignorePatterns []*regexp.Regexp, watcher *fsnotify.Watcher) error {
 	if base == "" {
 		base = "."
 	}
+
 
 	if debug {
 		log.Printf("walks watched directories '%s'", base)
 	}
 
-	ignores := []string{}
-	if ignoreDir != nil {
-		if e, ok := ignoreDir.(string); ok {
-			ignores = append(ignores, e)
-		} else if e, ok := ignoreDir.([]interface{}); ok {
-			for _, i := range e {
-				ignores = append(ignores, i.(string))
-			}
-		} else {
-			v := reflect.ValueOf(ignoreDir)
-			return fmt.Errorf("invalid format ignore_dir: %v", v.Type())
-		}
-		if debug {
-			log.Printf("ignore_dir: %v", ignores)
-		}
-	}
-
 	// register watched directories.
 	err := filepath.Walk(base, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || !fi.IsDir() {
+			// watche only directries
 			return nil
 		}
 
-		for _, ig := range ignores {
-			if strings.HasPrefix(ig, "/") {
-				ig = strings.TrimPrefix(ig, "/")
-				if strings.HasPrefix(path, ig) {
+		path = normalizePath(path)
+
+		for _, pattern := range ignorePatterns {
+			if !strings.HasPrefix(path, "/") {
+				// add "/" to the path
+				if ok := pattern.MatchString("/" + path); ok {
 					return nil
 				}
 			} else {
-				if strings.Contains(path, ig) {
+				if ok := pattern.MatchString(path); ok {
 					return nil
 				}
 			}
