@@ -1,18 +1,18 @@
 package main
 
 import (
-	"regexp"
-	"reflect"
 	"fmt"
+	"reflect"
+	"regexp"
 )
 
 type WatchConfig struct {
 	Base string `yaml:"base"`
 	// string or []string
-	Ignore interface{} `yaml:"ignore"`
+	Ignore         interface{}      `yaml:"ignore"`
 	IgnorePatterns []*regexp.Regexp `yaml:"-"`
 	// string or []string
-	Pattern interface{} `yaml:"pattern"`
+	Pattern  interface{}      `yaml:"pattern"`
 	Patterns []*regexp.Regexp `yaml:"-"`
 }
 

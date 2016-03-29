@@ -162,7 +162,6 @@ func watch(base string, ignorePatterns []*regexp.Regexp, watcher *fsnotify.Watch
 		base = "."
 	}
 
-
 	if debug {
 		log.Printf("walks watched directories '%s'", base)
 	}

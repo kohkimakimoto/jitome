@@ -19,8 +19,8 @@ The following is an example of configuration.
 build:
   watch:
     - base: ""
-      ignore_dir: [".git"]
-      pattern: '.+\.go$'
+      ignore: [".git"]
+      pattern: "*.go"
   script: |
     go build .
 ```

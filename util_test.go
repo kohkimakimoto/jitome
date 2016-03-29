@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-
-
 func TestCompliePattern(t *testing.T) {
 	p := compilePattern(".git")
 	fmt.Printf("regex: %s (from '.git')\n", p.String())

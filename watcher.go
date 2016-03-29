@@ -15,10 +15,10 @@ type Watcher struct {
 
 func NewWatcher(jitome *Jitome, target *Target, watchConfig *WatchConfig, w *fsnotify.Watcher, index int) (*Watcher, error) {
 	watcher := &Watcher{
-		Jitome:        jitome,
-		Target:          target,
-		WatchConfig:   watchConfig,
-		w:             w,
+		Jitome:      jitome,
+		Target:      target,
+		WatchConfig: watchConfig,
+		w:           w,
 
 		index: index,
 	}
