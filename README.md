@@ -1,5 +1,7 @@
 # Jitome
 
+[![Build Status](https://travis-ci.org/kohkimakimoto/jitome.svg?branch=master)](https://travis-ci.org/kohkimakimoto/jitome)
+
 ![logo.png](logo.png)
 
 Jitome is a simple file watcher.
@@ -15,7 +17,7 @@ $ go get github.com/kohkimakimoto/jitome
 Run `jitome -i` to create `jitome.yml` file that is a main configuration file for jitome.
 The following is an example of configuration.
 
-```yaml
+```
 build:
   watch:
     - base: ""
@@ -24,6 +26,7 @@ build:
   script: |
     go build .
 ```
+
 run `jitome`. It is watching file changing.
 
 ```
