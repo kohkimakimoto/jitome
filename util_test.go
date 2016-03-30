@@ -50,5 +50,4 @@ func TestCompliePattern(t *testing.T) {
 	if !p.MatchString("hoge.go") {
 		t.Error("should not be matched")
 	}
-
 }
