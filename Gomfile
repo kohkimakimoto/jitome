@@ -3,3 +3,6 @@ gom "gopkg.in/yaml.v2"
 gom "gopkg.in/check.v1"
 gom "github.com/fatih/color"
 gom "github.com/shiena/ansicolor"
+gom "github.com/deckarep/gosx-notifier"
+
+gom "github.com/jteeuwen/go-bindata/go-bindata"

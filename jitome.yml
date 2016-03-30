@@ -4,12 +4,13 @@ init:
     script: |
       echo "booted!"
 
-      
+
 # targets.
 build:
+  notification: true
   watch:
     - base: ""
       ignore: [".git"]
       pattern: "*.go"
   script: |
-    go build .
+    make

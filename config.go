@@ -13,6 +13,7 @@ var initialConfig = `# Jitome is a simple file watcher. - https://github.com/koh
 
 # targets.
 build:
+  notification: true
   watch:
     - base: ""
       ignore: [".git"]

@@ -3,9 +3,10 @@ package main
 import "time"
 
 type Target struct {
-	Name   string         `yaml:"-"`
-	Watch  []*WatchConfig `yaml:"watch"`
-	Script string         `yaml:"script"`
+	Name         string         `yaml:"-"`
+	Notification bool           `yaml:"notification"`
+	Watch        []*WatchConfig `yaml:"watch"`
+	Script       string         `yaml:"script"`
 
 	events chan *Event
 	jitome *Jitome

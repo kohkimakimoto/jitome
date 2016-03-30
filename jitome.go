@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"github.com/deckarep/gosx-notifier"
 	"github.com/fsnotify/fsnotify"
+	"github.com/kohkimakimoto/jitome/bindata"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -102,18 +106,54 @@ func (jitome *Jitome) Start() error {
 
 	for {
 		event := <-jitome.Events
-		runTask(event)
+		runTarget(event)
 	}
 
 	return nil
 }
 
-func runTask(event *Event) {
+func runTarget(event *Event) {
 	log.Printf("'%s' target detected '%s' changing [%s]. running script.", FgCB(event.Watcher.Target.Name), FgYB(event.Ev.Name), FgGB(eventOpStr(&event.Ev)))
 
+	target := event.Watcher.Target
+
+	if runtime.GOOS == "darwin" && target.Notification {
+		// desktop notification is supported only darwin.
+
+		// tmp image file.
+		tmpFile, err := ioutil.TempFile("", "jitome.icon.")
+		if err != nil {
+			log.Print(err)
+		}
+		defer func() {
+			tmpFile.Close()
+			os.Remove(tmpFile.Name())
+		}()
+
+		appIcon := tmpFile.Name()
+
+		if debug {
+			log.Printf("generated icon file: %s", appIcon)
+		}
+
+		err = ioutil.WriteFile(appIcon, bindata.MustAsset("logo.png"), 0644)
+		if err != nil {
+			log.Print(err)
+		}
+
+		notification := gosxnotifier.NewNotification(fmt.Sprintf("'%s' target detected '%s' changing.", event.Watcher.Target.Name, event.Ev.Name))
+		notification.Title = "Jitome"
+		notification.Sound = gosxnotifier.Default
+		notification.AppIcon = appIcon
+
+		err = notification.Push()
+		if err != nil {
+			log.Print(err)
+		}
+	}
+
 	path := event.Ev.Name
-	task := event.Watcher.Target
-	script := task.Script
+	script := target.Script
 
 	script = os.Expand(script, func(s string) string {
 		switch s {
