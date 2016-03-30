@@ -26,7 +26,7 @@ build:
     go build .
 ```
 
-run `jitome`. It is watching file changing.
+Run `jitome`. It is watching file changing.
 
 ```
 $ jitome
