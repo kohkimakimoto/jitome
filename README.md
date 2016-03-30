@@ -33,6 +33,9 @@ run `jitome`. It is watching file changing.
 $ jitome
 ```
 
+## Configuration
+
+
 ## Author
 
 Kohki Makimoto <kohki.makimoto@gmail.com>
