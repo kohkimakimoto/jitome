@@ -1,5 +1,10 @@
 # Jitome is a simple file watcher. - https://github.com/kohkimakimoto/jitome
 
+init:
+    script: |
+      echo "booted!"
+
+      
 # targets.
 build:
   watch:
