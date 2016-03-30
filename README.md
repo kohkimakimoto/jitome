@@ -79,8 +79,8 @@ The top level property as the above `build` and `test` is a ***target***.
 
 ### init target
 
-`init` target is a special purpose target.
-Is has only `script` property and runs when Jitome starts.
+The `init` target is a special purpose target.
+It has only `script` property and runs when Jitome starts.
 
 ```yaml
 init:
