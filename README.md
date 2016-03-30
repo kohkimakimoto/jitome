@@ -32,7 +32,7 @@ run `jitome`. It is watching file changing.
 $ jitome
 ```
 
-When you change a `.go` file, Jitome detects it and runs target.
+When you change a `.go` file, Jitome detects it and runs a target.
 
 ```
 [jitome] starting jitome...
