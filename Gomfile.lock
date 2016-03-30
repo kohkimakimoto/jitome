@@ -1,7 +1,0 @@
-gom 'github.com/fsnotify/fsnotify', :commit => '3c39c22b2c7b0516d5f2553f1608e5d13cb19053'
-gom 'gopkg.in/yaml.v2', :commit => 'a83829b6f1293c91addabc89d0571c246397bbf4'
-gom 'gopkg.in/check.v1', :commit => '4f90aeace3a26ad7021961c297b22c42160c7b25'
-gom 'github.com/fatih/color', :commit => '533cd7fd8a85905f67a1753afb4deddc85ea174f'
-gom 'github.com/shiena/ansicolor', :commit => 'a422bbe96644373c5753384a59d678f7d261ff10'
-gom 'github.com/deckarep/gosx-notifier', :commit => '9daaf8a4715ebe4daf300036644762fe27d3aded'
-gom 'github.com/jteeuwen/go-bindata/go-bindata', :commit => 'a0ff2567cfb70903282db057e799fd826784d41d'

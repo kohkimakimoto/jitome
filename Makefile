@@ -9,7 +9,7 @@ bindata:
 	@cd ./bindata/src/ && go-bindata -pkg bindata -ignore "^\." -o ../bindata.go ./...
 
 deps:
+	rm -rf vendor
 	gom install
+	rm -rf vendor/**/.git
 
-updatedeps:
-	rm Gomfile.lock; rm -rf vendor; gom install && gom lock
