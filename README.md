@@ -6,6 +6,10 @@
 
 Jitome is a simple file watcher.
 
+## Requirement
+
+Go1.6 or later.
+
 ## Installation
 
 ```
