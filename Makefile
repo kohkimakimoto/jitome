@@ -11,5 +11,5 @@ bindata:
 deps:
 	rm -rf vendor
 	gom install
-	rm -rf vendor/**/.git
-
+	rm -rf vendor/**/**/.git
+	rm -rf vendor/**/**/**/.git
