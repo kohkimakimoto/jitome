@@ -54,6 +54,9 @@ func realMain() int {
 		panic(fmt.Errorf("'%s' is not found. If you want to get help, run 'jitome -h'.", configFile))
 	}
 
+	log.Print("starting jitome...")
+	log.Printf("loading config '%s'", FgYB(configFile))
+
 	b, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		panic(err)

@@ -37,8 +37,6 @@ func NewJitome(config *Config) *Jitome {
 }
 
 func (jitome *Jitome) Start() error {
-	log.Print("starting jitome...")
-
 	// check init task
 	for name, target := range jitome.Config.Targets {
 		if name == "init" {
@@ -73,7 +71,7 @@ func (jitome *Jitome) Start() error {
 		target.events = make(chan *Event, 30)
 		target.jitome = jitome
 
-		log.Print("evaluate target '" + FgCB(name) + "'.")
+		log.Print("evaluating target '" + FgCB(name) + "'.")
 
 		// register watched directories
 		for i, watchConfig := range target.Watch {
