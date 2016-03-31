@@ -9,9 +9,10 @@ Jitome is a simple file watcher.
 * [Requirement](#requirement)
 * [Installation](#installation)
 * [Usage](#usage)
-    * [Configuration](#configuration)
+* [Configuration](#configuration)
     * [Target](#target)
     * [Init target](#init-target)
+    * [Notification](#notification)
 * [Author](#author)
 * [License](#license)
 * [Inspired by](#inspired-by)
@@ -102,6 +103,23 @@ init:
     echo "booted!"
 
 ```
+
+### Notification
+
+Jitome supports desktop notification (Mac OS X only). Set `notification` property `true`.
+
+```yaml
+build:
+  notification: true
+  watch:
+    - base: ""
+      ignore: [".git"]
+      pattern: "*.go"
+  script: |
+    go build .
+```
+
+![notification.png](notification.png)
 
 ## Author
 
