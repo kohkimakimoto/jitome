@@ -6,6 +6,16 @@
 
 Jitome is a simple file watcher.
 
+* [Requirement](#requirement)
+* [Installation](#installation)
+* [Usage](#usage)
+    * [Configuration](#configuration)
+    * [Target](#target)
+    * [Init target](#init-target)
+* [Author](#author)
+* [License](#license)
+* [Inspired by](#inspired-by)
+
 ## Requirement
 
 Go1.6 or later.
@@ -75,13 +85,13 @@ test:
     go test .
 ```
 
-### target
+### Target
 
 The top level property as the above `build` and `test` is a ***target***.
 
 ***target*** is a unit of config that defines watching patterns and a script that runs when it detects file changing.
 
-### init target
+### Init target
 
 The `init` target is a special purpose target.
 It has only `script` property and runs when Jitome starts.
