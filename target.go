@@ -5,6 +5,7 @@ import "time"
 type Target struct {
 	Name         string         `yaml:"-"`
 	Notification bool           `yaml:"notification"`
+	Restart      bool           `yaml:"restart"`
 	Watch        []*WatchConfig `yaml:"watch"`
 	Script       string         `yaml:"script"`
 
@@ -34,7 +35,7 @@ func (target *Target) Wait() {
 				}
 			case <-timer.C:
 				for _, be := range buffer {
-					target.jitome.Events <- be
+					target.jitome.events <- be
 				}
 				break outer
 			}

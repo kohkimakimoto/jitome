@@ -1,23 +1,33 @@
 package main
 
 type Config struct {
-	Targets map[string]*Target
+	Command     string             `yaml:"command"`
+	Targets     map[string]*Target `yaml:"targets"`
+	commandArgs []string
+}
+
+func NewConfig() *Config {
+	return &Config{
+		Targets:     map[string]*Target{},
+		commandArgs: []string{},
+	}
 }
 
 var initialConfig = `# Jitome is a simple file watcher. - https://github.com/kohkimakimoto/jitome
 
-# init is a special target that runs when jitome starts.
-#init:
-#  script: |
-#    echo "current directory is $(pwd)"
+# command.
+# command: "your/server/start/command"
 
 # targets.
-build:
-  notification: true
-  watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
-  script: |
-    go build .
+targets:
+  build:
+    notification: true
+    restart: false
+    watch:
+      - base: ""
+        ignore: [".git"]
+        pattern: "*.go"
+    script: |
+      go build .
+
 `

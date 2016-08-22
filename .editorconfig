@@ -1,0 +1,13 @@
+root = true
+
+[*]
+indent_style = space
+end_of_line = lf
+charset = utf-8
+
+[*.go]
+indent_style = tab
+
+[*.yml]
+indent_style = space
+indent_size = 2

@@ -1,14 +1,14 @@
-.PHONY: default build bindata deps updatedeps
+.PHONY: default build bindata deps_update
 
 default: build
 
-build:
+build: bindata
 	go build .
 
 bindata:
-	@cd ./bindata/src/ && go-bindata -pkg bindata -ignore "^\." -o ../bindata.go ./...
+	@cd ./bindata/ && go-bindata -pkg bindata -prefix "src" -o bindata.go src/...
 
-deps:
+deps_update:
 	rm -rf vendor
 	gom install
 	rm -rf vendor/**/**/.git

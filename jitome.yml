@@ -1,16 +1,22 @@
 # Jitome is a simple file watcher. - https://github.com/kohkimakimoto/jitome
 
-init:
+command: "echo hogehoge"
+targets:
+  build:
+    notification: true
+    watch:
+      - base: ""
+        ignore: [".git", "bindata/bindata.go"]
+        pattern: "*.go"
     script: |
-      echo "booted!"
-
-
-# targets.
-build:
-  notification: true
-  watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
-  script: |
-    make
+      make
+  test:
+    restart: true
+    notification: true
+    watch:
+      - base: ""
+        ignore: [".git", "bindata/bindata.go"]
+        pattern: "*.go"
+    script: |
+      echo "aaaaa"
+      echo "ccccc"

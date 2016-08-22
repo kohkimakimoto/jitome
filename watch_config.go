@@ -9,24 +9,24 @@ import (
 type WatchConfig struct {
 	Base string `yaml:"base"`
 	// string or []string
-	Ignore         interface{}      `yaml:"ignore"`
-	IgnorePatterns []*regexp.Regexp `yaml:"-"`
+	Ignore     interface{}      `yaml:"ignore"`
+	ignoreRegs []*regexp.Regexp `yaml:"-"`
 	// string or []string
-	Pattern  interface{}      `yaml:"pattern"`
-	Patterns []*regexp.Regexp `yaml:"-"`
+	Pattern     interface{}      `yaml:"pattern"`
+	PatternRegs []*regexp.Regexp `yaml:"-"`
 }
 
 func (wc *WatchConfig) InitPatterns() {
-	wc.IgnorePatterns = []*regexp.Regexp{}
+	wc.ignoreRegs = []*regexp.Regexp{}
 
 	if wc.Ignore != nil {
 		if e, ok := wc.Ignore.(string); ok {
 			p := compilePattern(e)
-			wc.IgnorePatterns = append(wc.IgnorePatterns, p)
+			wc.ignoreRegs = append(wc.ignoreRegs, p)
 		} else if e, ok := wc.Ignore.([]interface{}); ok {
 			for _, i := range e {
 				p := compilePattern(i.(string))
-				wc.IgnorePatterns = append(wc.IgnorePatterns, p)
+				wc.ignoreRegs = append(wc.ignoreRegs, p)
 			}
 		} else {
 			v := reflect.ValueOf(wc.Ignore)
@@ -34,15 +34,15 @@ func (wc *WatchConfig) InitPatterns() {
 		}
 	}
 
-	wc.Patterns = []*regexp.Regexp{}
+	wc.PatternRegs = []*regexp.Regexp{}
 	if wc.Pattern != nil {
 		if patternStr, ok := wc.Pattern.(string); ok {
 			p := compilePattern(patternStr)
-			wc.Patterns = append(wc.Patterns, p)
+			wc.PatternRegs = append(wc.PatternRegs, p)
 		} else if e, ok := wc.Pattern.([]interface{}); ok {
 			for _, patternStr := range e {
 				p := compilePattern(patternStr.(string))
-				wc.Patterns = append(wc.Patterns, p)
+				wc.PatternRegs = append(wc.PatternRegs, p)
 			}
 		} else {
 			v := reflect.ValueOf(wc.Pattern)
