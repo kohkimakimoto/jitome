@@ -53,15 +53,10 @@ targets:
       go build .
 ```
 
-Run `jitome`. It is watching file changing.
+Run `jitome`.
 
 ```
 $ jitome
-```
-
-When you change a `.go` file, Jitome detects it and runs a target.
-
-```
 [jitome] starting jitome...
 [jitome] loading config 'jitome.yml'
 [jitome] evaluating target 'build'.
