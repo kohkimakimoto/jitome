@@ -123,9 +123,30 @@ targets:
 
 #### Restart
 
+Restart restarts command after a target runs a script. See [Command](#command).
 
 ### Command
 
+Jitome supports to start an arbitrary command, when Jitome runs. And It can restart the command when It's targets fire. It is useful for development web application.
+
+```yaml
+command: "server_command"
+targets:
+  build:
+    restart: true
+    watch:
+      - base: ""
+        ignore: [".git"]
+        pattern: "*.go"
+    script: |
+      go build .
+```
+
+`comamnd` defines a command to run. and `build` target defines `restart` as `true`. These settings behave as the following:
+
+```
+
+```
 
 ## Author
 
