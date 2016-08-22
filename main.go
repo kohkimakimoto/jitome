@@ -106,7 +106,7 @@ func generateConfig() error {
 }
 
 func printUsage() {
-	fmt.Println(`Usage: jitome [<options>]
+	fmt.Println(`Usage: jitome [<options>] [<command>]
 
   Jitome is a simple file watcher.
 
