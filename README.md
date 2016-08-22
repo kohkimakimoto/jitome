@@ -129,6 +129,8 @@ Restart restarts command after a target runs a script. See [Command](#command).
 
 Jitome supports to start an arbitrary command, when Jitome runs. And It can restart the command when It's targets fire. It is useful for development web application.
 
+See the below example:
+
 ```yaml
 command: "server_command"
 targets:
