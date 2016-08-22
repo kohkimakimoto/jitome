@@ -234,26 +234,15 @@ func runTarget(event *Event) {
 	log.Printf("'%s' target finished script.", FgCB(event.Watcher.Target.Name))
 
 	if target.Restart {
-		log.Print("restarting...")
-		err = target.jitome.restartCommand()
-		if err != nil {
-			log.Print(FgRB(fmt.Sprintf("[warning] %v", err)))
-		}
+		go func(){
+			log.Print("restarting...")
+			err = target.jitome.restartCommand()
+			if err != nil {
+				log.Print(FgRB(fmt.Sprintf("[warning] %v", err)))
+			}
+			log.Print("restarted command.")
+		}()
 	}
-}
-
-func runCommand(command string) error {
-	var cmd *exec.Cmd
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command("cmd", "/c", command)
-	} else {
-		cmd = exec.Command("sh", "-c", command)
-	}
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	return cmd.Run()
 }
 
 func watch(base string, ignorePatterns []*regexp.Regexp, watcher *fsnotify.Watcher) error {

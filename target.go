@@ -1,6 +1,8 @@
 package main
 
-import "time"
+import(
+	"time"
+)
 
 type Target struct {
 	Name         string         `yaml:"-"`
@@ -16,7 +18,6 @@ type Target struct {
 func (target *Target) Wait() {
 	for {
 		event := <-target.events
-
 		buffer := []*Event{event}
 		bufferedFilesMap := map[string]int{event.Ev.Name: 1}
 
