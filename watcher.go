@@ -38,7 +38,7 @@ func (watcher *Watcher) Wait() {
 
 			if event.Op&fsnotify.Create != 0 && isDir(path) {
 				for _, watchConfig := range watcher.Target.Watch {
-					err := watch(path, watchConfig.IgnorePatterns, watcher.w)
+					err := watch(path, watchConfig.ignoreRegs, watcher.w)
 					if err != nil {
 						panic(err)
 					}
@@ -71,11 +71,11 @@ func (watcher *Watcher) Wait() {
 }
 
 func (watcher *Watcher) Match(path string) bool {
-	if len(watcher.WatchConfig.Patterns) == 0 {
+	if len(watcher.WatchConfig.PatternRegs) == 0 {
 		return true
 	}
 
-	for _, ptn := range watcher.WatchConfig.IgnorePatterns {
+	for _, ptn := range watcher.WatchConfig.ignoreRegs {
 		if debug {
 			log.Printf("cheking ignore pattern '%s'", ptn.String())
 		}
@@ -88,7 +88,7 @@ func (watcher *Watcher) Match(path string) bool {
 		}
 	}
 
-	for _, ptn := range watcher.WatchConfig.Patterns {
+	for _, ptn := range watcher.WatchConfig.PatternRegs {
 		if debug {
 			log.Printf("cheking pattern '%s'", ptn.String())
 		}

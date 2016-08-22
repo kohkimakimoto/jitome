@@ -6,6 +6,8 @@
 
 Jitome is a simple file watcher.
 
+Table of Contents
+
 * [Requirement](#requirement)
 * [Installation](#installation)
 * [Usage](#usage)
@@ -111,6 +113,7 @@ Jitome supports desktop notification (Mac OS X only). Set `notification` propert
 ```yaml
 build:
   notification: true
+  restart: true
   watch:
     - base: ""
       ignore: [".git"]

@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/kballard/go-shellquote"
+	"github.com/mattn/go-shellwords"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -12,7 +14,7 @@ import (
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Fprintf(ColorStderrWriter, FgRB("[jitome] error: %v\n", err))
+			fmt.Fprintf(os.Stderr, FgRB("jitome error: %v\n", err))
 			os.Exit(1)
 		}
 	}()
@@ -25,7 +27,7 @@ var configFile string
 
 func realMain() int {
 	log.SetPrefix(FgGB("[jitome] "))
-	log.SetOutput(ColorStdoutWriter)
+	log.SetOutput(os.Stdout)
 	log.SetFlags(0)
 
 	var initFlag bool
@@ -62,10 +64,23 @@ func realMain() int {
 		panic(err)
 	}
 
-	config := &Config{}
-	err = yaml.Unmarshal(b, &config.Targets)
+	config := NewConfig()
+	err = yaml.Unmarshal(b, &config)
 	if err != nil {
 		panic(err)
+	}
+
+	if config.Command != "" {
+		args, err := shellwords.Parse(config.Command)
+		if err != nil {
+			panic(err)
+		}
+		config.commandArgs = args
+	}
+
+	if nargs := flag.NArg(); nargs > 0 {
+		config.Command = shellquote.Join(flag.Args()...)
+		config.commandArgs = flag.Args()
 	}
 
 	j := NewJitome(config)
@@ -96,8 +111,9 @@ func printUsage() {
   Jitome is a simple file watcher.
 
 Options:
-  -c|-config    Specify a config file.
-  -i|-init      Create initial config file.
-  -d|-debug     Run on debug mode.
+  -c, -config    Load configuration from a file. default 'jitome.yml'
+  -i, -init      Create initial config file.
+  -d, -debug     Run on debug mode.
+  -h, -help      Show help.
 `)
 }
