@@ -14,14 +14,15 @@ func NewConfig() *Config {
 }
 
 var initialConfig = `# Jitome is a simple file watcher. - https://github.com/kohkimakimoto/jitome
-# command (optional).
+
+# command.
 # command: "your/server/start/command"
 
 # targets.
 targets:
   build:
     notification: true
-    restart: true
+    restart: false
     watch:
       - base: ""
         ignore: [".git"]

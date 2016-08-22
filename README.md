@@ -12,9 +12,10 @@ Table of Contents
 * [Installation](#installation)
 * [Usage](#usage)
 * [Configuration](#configuration)
-    * [Target](#target)
-    * [Init target](#init-target)
+  * [Targets](#targets)
     * [Notification](#notification)
+    * [Restart](#restart)
+  * [Command](#command)
 * [Author](#author)
 * [License](#license)
 * [Inspired by](#inspired-by)
@@ -34,13 +35,22 @@ $ go get github.com/kohkimakimoto/jitome
 Run `jitome -i` to create `jitome.yml` file that is a main configuration file for Jitome.
 
 ```yaml
-build:
-  watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
-  script: |
-    go build .
+# Jitome is a simple file watcher. - https://github.com/kohkimakimoto/jitome
+
+# command.
+# command: "your/server/start/command"
+
+# targets.
+targets:
+  build:
+    notification: true
+    restart: false
+    watch:
+      - base: ""
+        ignore: [".git"]
+        pattern: "*.go"
+    script: |
+      go build .
 ```
 
 Run `jitome`. It is watching file changing.
@@ -56,11 +66,13 @@ When you change a `.go` file, Jitome detects it and runs a target.
 [jitome] loading config 'jitome.yml'
 [jitome] evaluating target 'build'.
 [jitome] watching files...
-[jitome] 'build' target detected 'color.go' changing [write]. running script.
-[jitome] 'build' target finished script.
-[jitome] 'build' target detected 'watcher.go' changing [write]. running script.
-[jitome] 'build' target finished script.
-[jitome] 'build' target detected 'watcher.go' changing [write]. running script.
+```
+
+Jitome starts watching file changing. So if you modify files, Jitome report as the following.
+
+```
+[jitome] 'build' target detected 'main.go' changing by event 'create'.
+[jitome] 'build' target running script...
 [jitome] 'build' target finished script.
 ```
 
@@ -71,58 +83,54 @@ Default configuration file that Jitome uses is `jitome.yml` at the current direc
 The following is an example of the configuration.
 
 ```yaml
-build:
-  watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
-  script: |
-    go build .
+command: "your/server/start/command"
+targets:
+  build:
+    watch:
+      - base: ""
+        ignore: [".git"]
+        pattern: "*.go"
+    script: |
+      go build .
 
-test:
-  watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
-  script: |
-    go test .
+  test:
+    watch:
+      - base: ""
+        ignore: [".git"]
+        pattern: "*.go"
+    script: |
+      go test .
 ```
 
-### Target
+### Targets
 
-The top level property as the above `build` and `test` is a ***target***.
+The ***targets*** are configurations for file watching.
 
-***target*** is a unit of config that defines watching patterns and a script that runs when it detects file changing.
+Each target as the above example `build` and `test` defines watching patterns and a script that runs when it detects file changing.
 
-### Init target
+#### Notification
 
-The `init` target is a special purpose target.
-It has only `script` property and runs when Jitome starts.
-
-```yaml
-init:
-  script: |
-    echo "booted!"
-
-```
-
-### Notification
-
-Jitome supports desktop notification (Mac OS X only). Set `notification` property `true`.
+Targets support desktop notification (Mac OS X only). Set `notification` property `true`.
 
 ```yaml
-build:
-  notification: true
-  restart: true
-  watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
-  script: |
-    go build .
+targets:
+  build:
+    notification: true
+    watch:
+      - base: ""
+        ignore: [".git"]
+        pattern: "*.go"
+    script: |
+      go build .
 ```
 
 ![notification.png](notification.png)
+
+#### Restart
+
+
+### Command
+
 
 ## Author
 
