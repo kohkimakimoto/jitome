@@ -132,7 +132,7 @@ Jitome supports to start an arbitrary command, when Jitome runs. And It can rest
 See the below example:
 
 ```yaml
-command: "server_command"
+command: "your_server_command"
 targets:
   build:
     restart: true
@@ -147,7 +147,21 @@ targets:
 `comamnd` defines a command to run. and `build` target defines `restart` as `true`. These settings behave as the following:
 
 ```
-
+$ itome   
+[jitome] starting jitome...
+[jitome] loading config 'jitome.yml'
+[jitome] evaluating target 'build'.
+[jitome] starting command 'your_server_command'...
+[jitome] watching files...
+[jitome] started command (pid: 23020).
+[jitome] 'build' target detected 'main.go' changing by event 'write'.
+[jitome] 'build' target running script...
+[jitome] 'build' target finished script.
+[jitome] restarting...
+[jitome] terminating command (pid: 23020)...
+[jitome] terminated command (pid: 23020).
+[jitome] starting command 'your_server_command'...
+[jitome] started command (pid: 23039).
 ```
 
 ## Author

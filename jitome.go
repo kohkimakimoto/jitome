@@ -128,7 +128,7 @@ func (jitome *Jitome) spawn() error {
 	}
 
 	if jitome.cmd.Process != nil {
-		log.Printf("started command (pid: %d)", jitome.cmd.Process.Pid)
+		log.Printf("started command (pid: %d).", jitome.cmd.Process.Pid)
 	}
 
 	return jitome.cmd.Wait()
@@ -157,7 +157,7 @@ func (jitome *Jitome) terminate() error {
 			jitome.cmd.Process.Kill()
 		}
 
-		log.Printf("terminated command. pid: %d", pid)
+		log.Printf("terminated command (pid: %d).", pid)
 	}
 
 	return nil
