@@ -147,7 +147,7 @@ targets:
 `comamnd` defines a command to run. and `build` target defines `restart` as `true`. These settings behave as the following:
 
 ```
-$ itome   
+$ jitome   
 [jitome] starting jitome...
 [jitome] loading config 'jitome.yml'
 [jitome] evaluating target 'build'.
