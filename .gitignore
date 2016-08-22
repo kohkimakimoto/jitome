@@ -9,6 +9,7 @@ Thumbs.db
 /vendor/bin
 
 /.jitome*
+/jitome.yml
 /jitome
 /jitome.exe
 /.jitome
