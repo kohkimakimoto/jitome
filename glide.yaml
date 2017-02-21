@@ -1,0 +1,6 @@
+package: github.com/kohkimakimoto/jitome
+import:
+- package: github.com/deckarep/gosx-notifier
+- package: github.com/fatih/color
+- package: github.com/fsnotify/fsnotify
+- package: gopkg.in/yaml.v2

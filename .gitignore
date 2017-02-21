@@ -4,9 +4,7 @@ Thumbs.db
 ._*
 .vagrant
 *.iml
-
-/vendor/pkg
-/vendor/bin
+.vscode/
 
 /.jitome*
 /jitome.yml

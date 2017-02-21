@@ -1,0 +1,23 @@
+hash: 6574795927f8776bcabd0509cd01cd5228718a283d4bfbc70fa2462a74aab230
+updated: 2017-02-21T13:52:33.824470224+09:00
+imports:
+- name: github.com/deckarep/gosx-notifier
+  version: 61a88900fb062ed8c63828adf4d7b58463b61f78
+- name: github.com/fatih/color
+  version: 7824417a424b65227be8ac9b14d545a7f3e6c3f0
+- name: github.com/fsnotify/fsnotify
+  version: a904159b9206978bb6d53fcc7a769e5cd726c737
+- name: github.com/mattn/go-colorable
+  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
+  repo: https://github.com/mattn/go-colorable
+- name: github.com/mattn/go-isatty
+  version: dda3de49cbfcec471bd7a70e6cc01fcc3ff90109
+  repo: https://github.com/mattn/go-isatty
+- name: golang.org/x/sys
+  version: e24f485414aeafb646f6fca458b0bf869c0880a1
+  repo: https://go.googlesource.com/sys
+  subpackages:
+  - unix
+- name: gopkg.in/yaml.v2
+  version: 4c78c975fe7c825c6d1466c42be594d1d6f3aba6
+testImports: []

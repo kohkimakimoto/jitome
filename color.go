@@ -4,7 +4,6 @@ import (
 	"github.com/fatih/color"
 )
 
-
 var FgBold = color.New(color.Bold).SprintfFunc()
 var FgG = color.New(color.FgGreen).SprintfFunc()
 var FgGB = color.New(color.FgGreen).Add(color.Bold).SprintfFunc()

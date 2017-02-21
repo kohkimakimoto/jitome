@@ -1,22 +1,23 @@
 package main
 
 import (
-	"github.com/fsnotify/fsnotify"
 	"log"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 type Watcher struct {
 	Jitome      *Jitome
-	Target      *Target
+	Task        *Task
 	WatchConfig *WatchConfig
 	w           *fsnotify.Watcher
 	index       int
 }
 
-func NewWatcher(jitome *Jitome, target *Target, watchConfig *WatchConfig, w *fsnotify.Watcher, index int) (*Watcher, error) {
+func NewWatcher(jitome *Jitome, task *Task, watchConfig *WatchConfig, w *fsnotify.Watcher, index int) (*Watcher, error) {
 	watcher := &Watcher{
 		Jitome:      jitome,
-		Target:      target,
+		Task:        task,
 		WatchConfig: watchConfig,
 		w:           w,
 
@@ -37,7 +38,7 @@ func (watcher *Watcher) Wait() {
 			}
 
 			if event.Op&fsnotify.Create != 0 && isDir(path) {
-				for _, watchConfig := range watcher.Target.Watch {
+				for _, watchConfig := range watcher.Task.Watch {
 					err := watch(path, watchConfig.ignoreRegs, watcher.w)
 					if err != nil {
 						panic(err)
@@ -54,12 +55,12 @@ func (watcher *Watcher) Wait() {
 			// check pattern.
 			if !watcher.Match(path) {
 				if debug {
-					log.Printf("target '%s' watcher %d detected changing '%s' but it was unmatched to pattern config", watcher.Target.Name, watcher.index, path)
+					log.Printf("task '%s' watcher %d detected changing '%s' but it was unmatched to pattern config", watcher.Task.Name, watcher.index, path)
 				}
 				continue
 			}
 
-			watcher.Target.events <- &Event{
+			watcher.Task.events <- &Event{
 				Watcher: watcher,
 				Ev:      event,
 			}

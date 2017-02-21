@@ -1,28 +1,25 @@
 package main
 
 type Config struct {
-	Command     string             `yaml:"command"`
-	Targets     map[string]*Target `yaml:"targets"`
+	Command     string           `yaml:"command"`
+	Commands    []string         `yaml:"commands"`
+	Tasks       map[string]*Task `yaml:"tasks"`
 	commandArgs []string
 }
 
 func NewConfig() *Config {
 	return &Config{
-		Targets:     map[string]*Target{},
+		Tasks:       map[string]*Task{},
 		commandArgs: []string{},
 	}
 }
 
 var initialConfig = `# Jitome is a simple file watcher. - https://github.com/kohkimakimoto/jitome
 
-# command.
-# command: "your/server/start/command"
-
-# targets.
-targets:
+# tasks.
+tasks:
   build:
     notification: true
-    restart: false
     watch:
       - base: ""
         ignore: [".git"]

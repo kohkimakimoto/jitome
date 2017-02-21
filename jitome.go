@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/deckarep/gosx-notifier"
-	"github.com/fsnotify/fsnotify"
-	"github.com/kohkimakimoto/jitome/bindata"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,6 +11,10 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/deckarep/gosx-notifier"
+	"github.com/fsnotify/fsnotify"
+	"github.com/kohkimakimoto/jitome/bindata"
 )
 
 type Jitome struct {
@@ -21,6 +22,7 @@ type Jitome struct {
 	watchers []*Watcher
 	events   chan *Event
 	cmd      *exec.Cmd
+	cmds      []*exec.Cmd
 }
 
 type Event struct {
@@ -33,27 +35,29 @@ func NewJitome(config *Config) *Jitome {
 		config:   config,
 		watchers: []*Watcher{},
 		events:   make(chan *Event),
+		cmds: []*exec.Cmd{},
 	}
 
 	return w
 }
 
 func (jitome *Jitome) Start() error {
-	// check init task
+	// start commands
+	err := jitome.startCommands()
+	if err != nil {
+		log.Print(FgRB(fmt.Sprintf("[warning] %v", err)))
+	}
+
 	// register watchers
-	for name, target := range jitome.config.Targets {
-		if name == "init" {
-			continue
-		}
+	for name, task := range jitome.config.Tasks {
+		task.Name = name
+		task.events = make(chan *Event, 30)
+		task.jitome = jitome
 
-		target.Name = name
-		target.events = make(chan *Event, 30)
-		target.jitome = jitome
-
-		log.Print("evaluating target '" + FgCB(name) + "'.")
+		log.Print("activating task '" + FgCB(name) + "'.")
 
 		// register watched directories
-		for i, watchConfig := range target.Watch {
+		for i, watchConfig := range task.Watch {
 			watchConfig.InitPatterns()
 			w, err := fsnotify.NewWatcher()
 			if err != nil {
@@ -65,7 +69,7 @@ func (jitome *Jitome) Start() error {
 				return err
 			}
 
-			watcher, err := NewWatcher(jitome, target, watchConfig, w, i)
+			watcher, err := NewWatcher(jitome, task, watchConfig, w, i)
 			if err != nil {
 				return err
 			}
@@ -73,7 +77,7 @@ func (jitome *Jitome) Start() error {
 			jitome.watchers = append(jitome.watchers, watcher)
 			go watcher.Wait()
 		}
-		go target.Wait()
+		go task.Wait()
 	}
 	defer jitome.Close()
 
@@ -81,14 +85,7 @@ func (jitome *Jitome) Start() error {
 		log.Print("watching files...")
 		for {
 			event := <-jitome.events
-			runTarget(event)
-		}
-	}()
-
-	go func() {
-		err := jitome.restartCommand()
-		if err != nil {
-			log.Print(FgRB(fmt.Sprintf("[warning] %v", err)))
+			runTask(event)
 		}
 	}()
 
@@ -96,56 +93,58 @@ func (jitome *Jitome) Start() error {
 	select {}
 }
 
-func (jitome *Jitome) restartCommand() error {
-	if len(jitome.config.commandArgs) == 0 {
-		return nil
+func (jitome *Jitome) startCommands() error {
+	config := jitome.config
+
+	for _, c := range config.Commands {
+		go func (c string) {
+			log.Printf("running command '%s'...", FgYB(c))
+			err := jitome.spawn(c)
+			if err != nil {
+				panic(err)
+			}
+		}(c)
 	}
 
-	if debug {
-		log.Printf("restart command '%s'", jitome.config.Command)
-	}
-
-	if err := jitome.terminate(); err != nil {
-		return err
-	}
-
-	return jitome.spawn()
+	return nil
 }
 
-//
-// spawn and terminate refers to https://github.com/mattn/goemon
-// MIT License: Yasuhiro Matsumoto
-//
-
-func (jitome *Jitome) spawn() error {
-	log.Printf("starting command '%s'...", FgYB(jitome.config.Command))
-	jitome.cmd = exec.Command(jitome.config.commandArgs[0], jitome.config.commandArgs[1:]...)
-	jitome.cmd.Stdout = os.Stdout
-	jitome.cmd.Stderr = os.Stderr
-	err := jitome.cmd.Start()
+func (jitome *Jitome) spawn(command string) (error) {
+	var shell, flag string
+	if runtime.GOOS == "windows" {
+		shell = "cmd"
+		flag = "/C"
+	} else {
+		shell = "bash"
+		flag = "-c"
+	}
+	cmd := exec.Command(shell, flag, command)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Start()
 	if err != nil {
 		return err
 	}
-
-	if jitome.cmd.Process != nil {
-		log.Printf("started command (pid: %d).", jitome.cmd.Process.Pid)
+	if cmd.Process != nil {
+		log.Printf("process: %s (pid: %d).", command, cmd.Process.Pid)
 	}
+	jitome.cmds = append(jitome.cmds, cmd)
 
-	return jitome.cmd.Wait()
+	return cmd.Wait()
 }
 
-func (jitome *Jitome) terminate() error {
-	if jitome.cmd != nil && jitome.cmd.Process != nil {
-		pid := jitome.cmd.Process.Pid
+func (jitome *Jitome) terminate(cmd *exec.Cmd) error {
+	if cmd != nil && cmd.Process != nil {
+		pid := cmd.Process.Pid
 		log.Printf("terminating command (pid: %d)...", pid)
 
-		if err := jitome.cmd.Process.Signal(os.Interrupt); err != nil {
+		if err := cmd.Process.Signal(os.Interrupt); err != nil {
 			log.Print(FgRB(fmt.Sprintf("[warning] %v", err)))
 			return nil
 		} else {
 			cd := 5
 			for cd > 0 {
-				if jitome.cmd.ProcessState != nil && jitome.cmd.ProcessState.Exited() {
+				if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
 					break
 				}
 				time.Sleep(time.Second)
@@ -153,8 +152,8 @@ func (jitome *Jitome) terminate() error {
 			}
 		}
 
-		if jitome.cmd.ProcessState != nil && jitome.cmd.ProcessState.Exited() {
-			jitome.cmd.Process.Kill()
+		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
+			cmd.Process.Kill()
 		}
 
 		log.Printf("terminated command (pid: %d).", pid)
@@ -163,12 +162,12 @@ func (jitome *Jitome) terminate() error {
 	return nil
 }
 
-func runTarget(event *Event) {
-	log.Printf("'%s' target detected '%s' changing by event '%s'.", FgCB(event.Watcher.Target.Name), FgYB(event.Ev.Name), FgYB(eventOpStr(&event.Ev)))
+func runTask(event *Event) {
+	log.Printf("'%s' task detected '%s' changing by event '%s'.", FgCB(event.Watcher.Task.Name), FgYB(event.Ev.Name), FgYB(eventOpStr(&event.Ev)))
 
-	target := event.Watcher.Target
+	task := event.Watcher.Task
 
-	if runtime.GOOS == "darwin" && target.Notification {
+	if runtime.GOOS == "darwin" && task.Notification {
 		// desktop notification is supported only darwin.
 
 		// tmp image file.
@@ -192,7 +191,7 @@ func runTarget(event *Event) {
 			log.Print(err)
 		}
 
-		notification := gosxnotifier.NewNotification(fmt.Sprintf("'%s' target detected '%s' changing.", event.Watcher.Target.Name, event.Ev.Name))
+		notification := gosxnotifier.NewNotification(fmt.Sprintf("'%s' task detected '%s' changing.", event.Watcher.Task.Name, event.Ev.Name))
 		notification.Title = "Jitome"
 		notification.Sound = gosxnotifier.Default
 		notification.AppIcon = appIcon
@@ -204,7 +203,7 @@ func runTarget(event *Event) {
 	}
 
 	path := event.Ev.Name
-	script := target.Script
+	script := task.Script
 
 	script = os.Expand(script, func(s string) string {
 		switch s {
@@ -221,7 +220,7 @@ func runTarget(event *Event) {
 		cmd = exec.Command("sh", "-c", script)
 	}
 
-	log.Printf("'%s' target running script...", FgCB(event.Watcher.Target.Name))
+	log.Printf("'%s' task running script...", FgCB(event.Watcher.Task.Name))
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -231,18 +230,7 @@ func runTarget(event *Event) {
 		log.Print(FgRB(fmt.Sprintf("[warning] %v", err)))
 	}
 
-	log.Printf("'%s' target finished script.", FgCB(event.Watcher.Target.Name))
-
-	if target.Restart {
-		go func(){
-			log.Print("restarting...")
-			err = target.jitome.restartCommand()
-			if err != nil {
-				log.Print(FgRB(fmt.Sprintf("[warning] %v", err)))
-			}
-			log.Print("restarted command.")
-		}()
-	}
+	log.Printf("'%s' task finished script.", FgCB(event.Watcher.Task.Name))
 }
 
 func watch(base string, ignorePatterns []*regexp.Regexp, watcher *fsnotify.Watcher) error {
@@ -298,5 +286,9 @@ func watch(base string, ignorePatterns []*regexp.Regexp, watcher *fsnotify.Watch
 func (jitome *Jitome) Close() {
 	for _, watcher := range jitome.watchers {
 		watcher.w.Close()
+	}
+
+	for _, cmd := range jitome.cmds {
+		jitome.terminate(cmd)
 	}
 }

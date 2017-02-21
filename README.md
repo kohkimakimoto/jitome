@@ -12,10 +12,9 @@ Table of Contents
 * [Installation](#installation)
 * [Usage](#usage)
 * [Configuration](#configuration)
-  * [Targets](#targets)
+  * [Tasks](#tasks)
     * [Notification](#notification)
-    * [Restart](#restart)
-  * [Command](#command)
+  * [Commands](#command)
 * [Author](#author)
 * [License](#license)
 * [Inspired by](#inspired-by)
@@ -40,11 +39,10 @@ Run `jitome -i` to create `jitome.yml` file that is a main configuration file fo
 # command.
 # command: "your/server/start/command"
 
-# targets.
-targets:
+# tasks.
+tasks:
   build:
     notification: true
-    restart: false
     watch:
       - base: ""
         ignore: [".git"]
@@ -59,16 +57,16 @@ Run `jitome`.
 $ jitome
 [jitome] starting jitome...
 [jitome] loading config 'jitome.yml'
-[jitome] evaluating target 'build'.
+[jitome] activating task 'build'.
 [jitome] watching files...
 ```
 
 Jitome starts watching file changing. So if you modify files, Jitome report as the following.
 
 ```
-[jitome] 'build' target detected 'main.go' changing by event 'create'.
-[jitome] 'build' target running script...
-[jitome] 'build' target finished script.
+[jitome] 'build' task detected 'main.go' changing by event 'create'.
+[jitome] 'build' task running script...
+[jitome] 'build' task finished script.
 ```
 
 ## Configuration
@@ -79,7 +77,7 @@ The following is an example of the configuration.
 
 ```yaml
 command: "your/server/start/command"
-targets:
+tasks:
   build:
     watch:
       - base: ""
@@ -97,18 +95,18 @@ targets:
       go test .
 ```
 
-### Targets
+### Tasks
 
-The ***targets*** are configurations for file watching.
+The ***tasks*** are configurations for file watching.
 
-Each target as the above example `build` and `test` defines watching patterns and a script that runs when it detects file changing.
+Each task as the above example `build` and `test` defines watching patterns and a script that runs when it detects file changing.
 
 #### Notification
 
-Targets support desktop notification (Mac OS X only). Set `notification` property `true`.
+Tasks support desktop notification (Mac OS X only). Set `notification` property `true`.
 
 ```yaml
-targets:
+tasks:
   build:
     notification: true
     watch:
@@ -121,47 +119,25 @@ targets:
 
 ![notification.png](notification.png)
 
-#### Restart
+### Commands
 
-Restart restarts command after a target runs a script. See [Command](#command).
-
-### Command
-
-Jitome supports to start an arbitrary command, when Jitome runs. And It can restart the command when It's targets fire. It is useful for development web application.
+Jitome supports to run arbitrary commands, when Jitome runs.
 
 See the below example:
 
 ```yaml
-command: "your_server_command"
-targets:
+commanda: 
+  - "echo foo"
+  - "echo bar"
+
+tasks:
   build:
-    restart: true
     watch:
       - base: ""
         ignore: [".git"]
         pattern: "*.go"
     script: |
       go build .
-```
-
-`comamnd` defines a command to run. and `build` target defines `restart` as `true`. These settings behave as the following:
-
-```
-$ jitome   
-[jitome] starting jitome...
-[jitome] loading config 'jitome.yml'
-[jitome] evaluating target 'build'.
-[jitome] starting command 'your_server_command'...
-[jitome] watching files...
-[jitome] started command (pid: 23020).
-[jitome] 'build' target detected 'main.go' changing by event 'write'.
-[jitome] 'build' target running script...
-[jitome] 'build' target finished script.
-[jitome] restarting...
-[jitome] terminating command (pid: 23020)...
-[jitome] terminated command (pid: 23020).
-[jitome] starting command 'your_server_command'...
-[jitome] started command (pid: 23039).
 ```
 
 ## Author

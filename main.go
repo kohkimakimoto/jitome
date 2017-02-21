@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/kballard/go-shellquote"
-	"github.com/mattn/go-shellwords"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -70,18 +68,18 @@ func realMain() int {
 		panic(err)
 	}
 
-	if config.Command != "" {
-		args, err := shellwords.Parse(config.Command)
-		if err != nil {
-			panic(err)
-		}
-		config.commandArgs = args
-	}
-
-	if nargs := flag.NArg(); nargs > 0 {
-		config.Command = shellquote.Join(flag.Args()...)
-		config.commandArgs = flag.Args()
-	}
+	//if config.Command != "" {
+	//	args, err := shellwords.Parse(config.Command)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	config.commandArgs = args
+	//}
+	//
+	//if nargs := flag.NArg(); nargs > 0 {
+	//	config.Command = shellquote.Join(flag.Args()...)
+	//	config.commandArgs = flag.Args()
+	//}
 
 	j := NewJitome(config)
 	err = j.Start()
