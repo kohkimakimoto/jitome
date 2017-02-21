@@ -126,7 +126,7 @@ Jitome supports to run arbitrary commands, when Jitome runs.
 See the below example:
 
 ```yaml
-commanda: 
+commands: 
   - "echo foo"
   - "echo bar"
 
