@@ -14,7 +14,7 @@ Table of Contents
 * [Configuration](#configuration)
   * [Tasks](#tasks)
     * [Notification](#notification)
-  * [Commands](#command)
+  * [Commands](#commands)
 * [Author](#author)
 * [License](#license)
 * [Inspired by](#inspired-by)
