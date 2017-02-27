@@ -92,8 +92,6 @@ test:
 
 ### 
 
-The ****** are configurations for file watching.
-
 Each task as the above example `build` and `test` defines watching patterns and a script that runs when it detects file changing.
 
 #### Notification
