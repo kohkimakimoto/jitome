@@ -106,8 +106,8 @@ tasks:
     notification: true
     watch:
       - base: ""
-        ignore: [".git"]
-        pattern: "*.go"
+        ignore: ["\.git$"]
+        pattern: "\.go$"
     script: |
       go build .
 ```
@@ -129,8 +129,8 @@ tasks:
   build:
     watch:
       - base: ""
-        ignore: [".git"]
-        pattern: "*.go"
+        ignore: ["\.git$"]
+        pattern: "\.go$"
     script: |
       go build .
 ```

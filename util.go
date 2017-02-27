@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 )
 
 var regexpForNormalizing = regexp.MustCompile("^\\./")
@@ -42,54 +41,12 @@ func eventOpStr(event *fsnotify.Event) string {
 	return opStr
 }
 
-// it is inspired by https://github.com/sabhiram/go-git-ignore/blob/master/ignore.go
 func compilePattern(line string) *regexp.Regexp {
 	if line == "" {
 		return nil
 	}
 
-	// If we encounter a foo/*.blah in a folder, prepend the / char
-	if regexp.MustCompile(`([^\/+])/.*\*\.`).MatchString(line) && line[0] != '/' {
-		line = "/" + line
-	}
-
-	// Handle escaping the "." char
-	line = regexp.MustCompile(`\.`).ReplaceAllString(line, `\.`)
-
-	magicStar := "#$~"
-
-	// Handle "/**/" usage
-	if strings.HasPrefix(line, "/**/") {
-		line = line[1:]
-	}
-	line = regexp.MustCompile(`/\*\*/`).ReplaceAllString(line, `(/|/.+/)`)
-	line = regexp.MustCompile(`\*\*/`).ReplaceAllString(line, `(|.`+magicStar+`/)`)
-	line = regexp.MustCompile(`/\*\*`).ReplaceAllString(line, `(|/.`+magicStar+`)`)
-
-	// Handle escaping the "*" char
-	line = regexp.MustCompile(`\\\*`).ReplaceAllString(line, `\`+magicStar)
-	line = regexp.MustCompile(`\*`).ReplaceAllString(line, `([^/]*)`)
-
-	// Handle escaping the "?" char
-	line = strings.Replace(line, "?", `\?`, -1)
-
-	line = strings.Replace(line, magicStar, "*", -1)
-
-	// Temporary regex
-	var expr = ""
-	if strings.HasSuffix(line, "/") {
-		expr = line + "(|.*)$"
-	} else {
-		expr = line + "(|/.*)$"
-	}
-	if strings.HasPrefix(expr, "/") {
-		expr = "^(|/)" + expr[1:]
-	} else {
-		expr = "^(|.*/)" + expr
-	}
-	pattern, _ := regexp.Compile(expr)
-
-	return pattern
+	return regexp.MustCompile(line)
 }
 
 //func compilePattern(pattern string) (*regexp.Regexp, error) {
