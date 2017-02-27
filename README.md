@@ -41,9 +41,9 @@ tasks:
   build:
     notification: true
     watch:
-      - base: ""
-        ignore: ["\.git$"]
-        pattern: "\.go$"
+      - base: ''
+        ignore: ['\.git$']
+        pattern: '\.go$'
     script: |
       go build .
 ```
@@ -75,17 +75,17 @@ The following is an example of the configuration.
 ```yaml
 build:
   watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
+    - base: ''
+      ignore: ['\.git$']
+      pattern: '\.go$'
   script: |
     go build .
 
 test:
   watch:
-    - base: ""
-      ignore: [".git"]
-      pattern: "*.go"
+    - base: ''
+      ignore: ['\.git$']
+      pattern: '\.go$'
   script: |
     go test .
 ```
@@ -103,9 +103,9 @@ tasks:
   build:
     notification: true
     watch:
-      - base: ""
-        ignore: ["\.git$"]
-        pattern: "\.go$"
+      - base: ''
+        ignore: ['\.git$']
+        pattern: '\.go$'
     script: |
       go build .
 ```
@@ -120,15 +120,15 @@ See the below example:
 
 ```yaml
 commands: 
-  - "echo foo"
-  - "echo bar"
+  - 'echo foo'
+  - 'echo bar'
 
 tasks:
   build:
     watch:
-      - base: ""
-        ignore: ["\.git$"]
-        pattern: "\.go$"
+      - base: ''
+        ignore: ['\.git$']
+        pattern: '\.go$'
     script: |
       go build .
 ```

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/fsnotify/fsnotify"
 	"os"
+	"log"
 	"path/filepath"
 	"regexp"
 )
@@ -42,6 +43,10 @@ func eventOpStr(event *fsnotify.Event) string {
 }
 
 func compilePattern(line string) *regexp.Regexp {
+	if debug {
+		log.Printf("compiling pattern '%s'", line)
+	}
+
 	if line == "" {
 		return nil
 	}

@@ -21,9 +21,9 @@ tasks:
   build:
     notification: true
     watch:
-      - base: ""
-        ignore: ["\.git$"]
-        pattern: "\.go$"
+      - base: ''
+        ignore: ['\.git$']
+        pattern: '\.go$'
     script: |
       go build .
 
