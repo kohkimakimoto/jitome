@@ -36,9 +36,6 @@ Run `jitome -i` to create `jitome.yml` file that is a main configuration file fo
 ```yaml
 # Jitome is a simple file watcher. - https://github.com/kohkimakimoto/jitome
 
-# command.
-# command: "your/server/start/command"
-
 # tasks.
 tasks:
   build:
@@ -76,28 +73,26 @@ Default configuration file that Jitome uses is `jitome.yml` at the current direc
 The following is an example of the configuration.
 
 ```yaml
-command: "your/server/start/command"
-tasks:
-  build:
-    watch:
-      - base: ""
-        ignore: [".git"]
-        pattern: "*.go"
-    script: |
-      go build .
+build:
+  watch:
+    - base: ""
+      ignore: [".git"]
+      pattern: "*.go"
+  script: |
+    go build .
 
-  test:
-    watch:
-      - base: ""
-        ignore: [".git"]
-        pattern: "*.go"
-    script: |
-      go test .
+test:
+  watch:
+    - base: ""
+      ignore: [".git"]
+      pattern: "*.go"
+  script: |
+    go test .
 ```
 
-### Tasks
+### 
 
-The ***tasks*** are configurations for file watching.
+The ****** are configurations for file watching.
 
 Each task as the above example `build` and `test` defines watching patterns and a script that runs when it detects file changing.
 
